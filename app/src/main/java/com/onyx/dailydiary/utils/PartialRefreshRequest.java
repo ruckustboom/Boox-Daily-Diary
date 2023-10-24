@@ -1,25 +1,21 @@
 package com.onyx.dailydiary.utils;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.view.SurfaceView;
 
-import com.onyx.android.sdk.api.device.epd.EpdController;
-import com.onyx.android.sdk.api.device.epd.UpdateMode;
 import com.onyx.android.sdk.rx.RxRequest;
 import com.onyx.android.sdk.utils.RectUtils;
 
 public class PartialRefreshRequest extends RxRequest {
-    private RectF refreshRect;
-    private BitmapView surfaceView;
+    private final RectF refreshRect;
+    private final BitmapView surfaceView;
     private Bitmap bitmap;
     private static final String TAG = PartialRefreshRequest.class.getSimpleName();
 
     public PartialRefreshRequest(Context context, BitmapView surfaceView, RectF refreshRect) {
-
         setContext(context);
 
         this.surfaceView = surfaceView;
@@ -32,7 +28,7 @@ public class PartialRefreshRequest extends RxRequest {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() {
         renderToScreen(surfaceView, bitmap);
     }
 
@@ -63,5 +59,4 @@ public class PartialRefreshRequest extends RxRequest {
         Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         canvas.drawBitmap(bitmap, rect, rect, null);
     }
-
 }

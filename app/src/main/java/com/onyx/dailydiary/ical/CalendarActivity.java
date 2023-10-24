@@ -1,14 +1,14 @@
 package com.onyx.dailydiary.ical;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.onyx.dailydiary.R;
 
@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,13 +29,12 @@ public class CalendarActivity extends AppCompatActivity implements iCalAdapter.O
     private final String filename = "calendar_list.txt";
 
 
-    iCalAdapter mAdapter;
+    private iCalAdapter mAdapter;
 
-    EditText cal_name;
-    EditText cal_url;
-    ArrayList<ArrayList<String>> calendarList= new ArrayList<>();
-    RecyclerView mRecentRecyclerView;
-    LinearLayoutManager mRecentLayoutManager;
+    private EditText cal_name;
+    private EditText cal_url;
+    private final ArrayList<ArrayList<String>> calendarList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,23 +60,22 @@ public class CalendarActivity extends AppCompatActivity implements iCalAdapter.O
 
         File calendarFile = new File(getExternalFilesDir(filepath), filename);
 
-        if (calendarFile.exists())
-        {
-            FileInputStream is = null;
+        if (calendarFile.exists()) {
+            FileInputStream is;
             try {
                 is = new FileInputStream(calendarFile);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String line = null;
+            String line;
             try {
                 line = reader.readLine();
 
-                while(line != null){
+                while (line != null) {
                     String[] splitLine = line.split(",");
 
-                    if (splitLine.length==3){
+                    if (splitLine.length == 3) {
                         ArrayList<String> calendarLine = new ArrayList<>(3);
                         calendarLine.add(splitLine[0]);
                         calendarLine.add(splitLine[1]);
@@ -90,18 +87,13 @@ public class CalendarActivity extends AppCompatActivity implements iCalAdapter.O
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-
         }
     }
 
     private void initRecyclerView() {
-
-
-
-        mRecentRecyclerView = (RecyclerView) findViewById(R.id.calendarICSRecyclerView);
+        RecyclerView mRecentRecyclerView = (RecyclerView) findViewById(R.id.calendarICSRecyclerView);
         mRecentRecyclerView.setHasFixedSize(false);
-        mRecentLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager mRecentLayoutManager = new LinearLayoutManager(this);
         mRecentRecyclerView.setLayoutManager(mRecentLayoutManager);
 
         mAdapter = new iCalAdapter(this, calendarList);
@@ -127,38 +119,27 @@ public class CalendarActivity extends AppCompatActivity implements iCalAdapter.O
 //
 //        };
         mRecentRecyclerView.setAdapter(mAdapter);
-
     }
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
-            case R.id.back_button:
+        int id = view.getId();
+        if (id == R.id.back_button) {
 //                onBackPressed();
-                finish();
-                break;
-            case R.id.cal_add_button:
-                addCaltoList();
-                break;
-
-
-
+            finish();
+        } else if (id == R.id.cal_add_button) {
+            addCaltoList();
         }
     }
 
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause");
-
         super.onPause();
-
-
     }
 
     @Override
-    public void onDestroy(){
-
-
+    public void onDestroy() {
         Log.d(TAG, "onDestroy");
         File calendarFile = new File(getExternalFilesDir(filepath), filename);
 
@@ -171,22 +152,18 @@ public class CalendarActivity extends AppCompatActivity implements iCalAdapter.O
             }
             writer.close();
         } catch (IOException ignored) {
-
         }
 
         super.onDestroy();
-
-
-
     }
-    private void addCaltoList()
-    {
+
+    private void addCaltoList() {
         int i = calendarList.size();
-        calendarList.add(new ArrayList(2));
-        calendarList.get(i).add(String.valueOf(cal_name.getText()).replace(",",""));
-        calendarList.get(i).add(String.valueOf(cal_url.getText()).replace(",",""));
+        calendarList.add(new ArrayList<>(2));
+        calendarList.get(i).add(String.valueOf(cal_name.getText()).replace(",", ""));
+        calendarList.get(i).add(String.valueOf(cal_url.getText()).replace(",", ""));
         calendarList.get(i).add(randomFileName());
-        mAdapter.notifyItemInserted(calendarList.size() );
+        mAdapter.notifyItemInserted(calendarList.size());
 
         cal_name.setText("");
         cal_url.setText("");

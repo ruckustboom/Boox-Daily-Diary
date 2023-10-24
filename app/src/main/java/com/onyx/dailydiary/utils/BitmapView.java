@@ -11,20 +11,15 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.onyx.android.sdk.api.device.epd.EpdController;
-import com.onyx.android.sdk.api.device.epd.UpdateMode;
 import com.onyx.android.sdk.data.note.TouchPoint;
-import com.onyx.android.sdk.utils.RectUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +27,7 @@ import java.io.FileOutputStream;
 import java.util.List;
 
 public class BitmapView extends SurfaceView {
-    int mStrokeWidth=4;
+    int mStrokeWidth = 4;
     public Bitmap mBitmap = null;
     String mFilename = null;
     int mBackground;
@@ -40,7 +35,7 @@ public class BitmapView extends SurfaceView {
     Paint eraserPaint;
     String mFilepath = null;
 
-    private Context mContext;
+    private final Context mContext;
 
     private static final String TAG = BitmapView.class.getSimpleName();
 
@@ -145,65 +140,57 @@ public class BitmapView extends SurfaceView {
 //    }
 
     @Override
-    protected void onWindowVisibilityChanged (int visibility)
-    {
+    protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
         Log.d(TAG, "onWindowVisibilityChanged " + visibility);
         redrawSurface();
 
     }
 
-    public void setFilename(String filename)
-    {
+    public void setFilename(String filename) {
         mFilename = filename;
         loadBitmap();
-        if (mBitmap==null) {
+        if (mBitmap == null) {
             resetBitmap();
         }
     }
 
-    public void setFilepath(String filepath)
-    {
+    public void setFilepath(String filepath) {
         mFilepath = filepath;
-
     }
 
 
-    public void setStrokeWidth(int strokeWidth)
-    {
+    public void setStrokeWidth(int strokeWidth) {
         mStrokeWidth = strokeWidth;
     }
 
-    public void setBackground(int background)
-    {
+    public void setBackground(int background) {
         mBackground = background;
     }
 
     @Override
-    public void onDraw(Canvas canvas)
-    {
+    public void onDraw(@NonNull Canvas canvas) {
         Log.d(TAG, "onDraw");
 
 //        canvas.drawColor(Color.WHITE);
 //        canvas.drawBitmap(mBitmap, 0, 0, null);
         super.onDraw(canvas);
-        if (mBitmap==null)
+        if (mBitmap == null)
             loadBitmap();
 
-        if (mBitmap==null)
+        if (mBitmap == null)
             resetBitmap();
         canvas.drawColor(Color.WHITE);
         canvas.drawBitmap(mBitmap, 0, 0, null);
 //        redrawSurface();
     }
 
-    public Bitmap getBitmap()
-    {
+    public Bitmap getBitmap() {
         return mBitmap;
     }
 
     @Override
-    public void onFocusChanged(boolean gainFocus,int direction,Rect previouslyFocusedRect) {
+    public void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
         Log.d(TAG, "onFocusChanged");
 
         redrawSurface();
@@ -222,8 +209,7 @@ public class BitmapView extends SurfaceView {
             Canvas canvas = new Canvas(mBitmap);
             canvas.drawColor(Color.WHITE);
             drawable.draw(canvas);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.d("resetBitmap Error: ", e.getMessage(), e);
         }
     }
@@ -231,19 +217,16 @@ public class BitmapView extends SurfaceView {
     public void loadBitmap() {
         try {
             Log.d(TAG, "loadBitmap");
-            if (mBitmap!=null)
+            if (mBitmap != null)
                 mBitmap.recycle();
 
             File myExternalFile = new File(mContext.getExternalFilesDir(mFilepath), mFilename);
-            if (myExternalFile.exists())
-            {
+            if (myExternalFile.exists()) {
                 BitmapFactory.Options opt = new BitmapFactory.Options();
                 opt.inScaled = true;
                 opt.inMutable = true;
-                mBitmap = BitmapFactory.decodeStream(new FileInputStream(myExternalFile),null, opt);
-            }
-            else
-            {
+                mBitmap = BitmapFactory.decodeStream(new FileInputStream(myExternalFile), null, opt);
+            } else {
                 resetBitmap();
 
             }
@@ -277,11 +260,10 @@ public class BitmapView extends SurfaceView {
     }
 
 
-
     public void partialRedraw(Rect renderRect) {
-
-        if (!getHolder().getSurface().isValid())
+        if (!getHolder().getSurface().isValid()) {
             return;
+        }
 
         Canvas canvas = getHolder().lockCanvas(renderRect);
         if (canvas == null) {
@@ -300,12 +282,11 @@ public class BitmapView extends SurfaceView {
     }
 
 
-
     public void saveBitmap() {
         Log.d(TAG, "saveBitmap");
         File myExternalFile = new File(mContext.getExternalFilesDir(mFilepath), mFilename);
         try {
-            FileOutputStream fos =  new FileOutputStream(myExternalFile);
+            FileOutputStream fos = new FileOutputStream(myExternalFile);
             mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.close();
         } catch (Exception e) {
@@ -314,11 +295,10 @@ public class BitmapView extends SurfaceView {
     }
 
     public void drawToBitmap(List<TouchPoint> list) {
-
         Canvas canvas = new Canvas(mBitmap);
         Rect limit = new Rect();
         Point offset = new Point();
-        getGlobalVisibleRect(limit,offset);
+        getGlobalVisibleRect(limit, offset);
 
         Path path = new Path();
 //
@@ -327,9 +307,9 @@ public class BitmapView extends SurfaceView {
 
 
         PointF prePoint = new PointF(list.get(0).x, list.get(0).y);
-        path.moveTo(prePoint.x-offset.x, prePoint.y-offset.y);
+        path.moveTo(prePoint.x - offset.x, prePoint.y - offset.y);
         for (TouchPoint point : list) {
-            path.quadTo(prePoint.x-offset.x, prePoint.y-offset.y, point.x-offset.x, point.y-offset.y);
+            path.quadTo(prePoint.x - offset.x, prePoint.y - offset.y, point.x - offset.x, point.y - offset.y);
             prePoint.x = point.x;
             prePoint.y = point.y;
         }
@@ -348,13 +328,13 @@ public class BitmapView extends SurfaceView {
         Canvas canvas = new Canvas(mBitmap);
         Rect limit = new Rect();
         Point offset = new Point();
-        getGlobalVisibleRect(limit,offset);
+        getGlobalVisibleRect(limit, offset);
 
         Path path = new Path();
         PointF prePoint = new PointF(list.get(0).x, list.get(0).y);
-        path.moveTo(prePoint.x-offset.x, prePoint.y-offset.y);
+        path.moveTo(prePoint.x - offset.x, prePoint.y - offset.y);
         for (TouchPoint point : list) {
-            path.quadTo(prePoint.x-offset.x, prePoint.y-offset.y, point.x-offset.x, point.y-offset.y);
+            path.quadTo(prePoint.x - offset.x, prePoint.y - offset.y, point.x - offset.x, point.y - offset.y);
             prePoint.x = point.x;
             prePoint.y = point.y;
         }
@@ -362,12 +342,11 @@ public class BitmapView extends SurfaceView {
         canvas.drawPath(path, eraserPaint);
 
         Drawable drawable = ResourcesCompat.getDrawable(getResources(), mBackground, null);
-        drawable.setBounds(0, 0,getWidth(), getHeight());
+        drawable.setBounds(0, 0, getWidth(), getHeight());
         drawable.draw(canvas);
-
     }
 
-    private void initView(){
+    private void initView() {
         Log.d(TAG, "initView");
 
         penPaint = new Paint();
@@ -386,12 +365,10 @@ public class BitmapView extends SurfaceView {
         eraserPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         eraserPaint.setStrokeJoin(Paint.Join.ROUND);
         eraserPaint.setStrokeCap(Paint.Cap.SQUARE);
-        eraserPaint.setStrokeWidth(10*mStrokeWidth);
+        eraserPaint.setStrokeWidth(10 * mStrokeWidth);
 
         setBackgroundColor(Color.WHITE);
         setZOrderOnTop(true);
         getHolder().setFormat(PixelFormat.TRANSPARENT);
-
     }
-
 }

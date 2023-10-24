@@ -68,11 +68,13 @@ public class GlobalDeviceReceiver extends BroadcastReceiver {
     private void handleSystemUIDialogAction(Intent intent) {
         String action = intent.getAction();
         String dialogType = intent.getStringExtra(DIALOG_TYPE);
-        boolean open = false;
+        boolean open;
         if (StringUtils.safelyEquals(dialogType, DIALOG_TYPE_NOTIFICATION_PANEL)) {
             if (StringUtils.safelyEquals(action, SYSTEM_UI_DIALOG_OPEN_ACTION)) {
                 open = true;
             } else if (StringUtils.safelyEquals(action, SYSTEM_UI_DIALOG_CLOSE_ACTION)) {
+                open = false;
+            } else {
                 open = false;
             }
             if (systemNotificationPanelChangeListener != null) {

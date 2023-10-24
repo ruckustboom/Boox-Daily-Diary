@@ -6,16 +6,8 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GestureDetectorCompat;
-
-import com.onyx.android.sdk.data.note.TouchPoint;
-import com.onyx.android.sdk.pen.TouchHelper;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,7 +29,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.onyx.android.sdk.rx.RxManager;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
+
+import com.onyx.android.sdk.pen.TouchHelper;
 import com.onyx.dailydiary.R;
 import com.onyx.dailydiary.databinding.ActivityWriterBinding;
 import com.onyx.dailydiary.utils.BitmapView;
@@ -47,14 +44,13 @@ import com.onyx.dailydiary.utils.PenCallback;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WriterActivity extends AppCompatActivity implements View.OnClickListener{
+public class WriterActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = WriterActivity.class.getSimpleName();
 
     private ActivityWriterBinding binding;
@@ -62,12 +58,11 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
     private GestureDetectorCompat mDetector;
 
     private TouchHelper touchHelper;
-    private final float STROKE_WIDTH = 4.0f;
+    private static final float STROKE_WIDTH = 4.0f;
 
     private final String filepath = "DailyDiary";
     private String filename;
-    private List<Rect> limitRectList = new ArrayList<>();
-
+    private final List<Rect> limitRectList = new ArrayList<>();
 
 
     private PenCallback penCallback;
@@ -89,35 +84,38 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
 
         List<BitmapView> viewList = new ArrayList<>();
         viewList.add(binding.writerview);
-        penCallback = new PenCallback(this,viewList);
+        penCallback = new PenCallback(this, viewList);
         touchHelper = TouchHelper.create(getWindow().getDecorView().getRootView(), penCallback);
         touchHelper.debugLog(false);
         touchHelper.setRawInputReaderEnable(true);
         penCallback.setTouchHelper(touchHelper);
 
         // setup the gestures
-        mDetector = new GestureDetectorCompat(this,new GestureListener(){
+        mDetector = new GestureDetectorCompat(this, new GestureListener() {
             @Override
             public void onSwipeBottom() {
-                if (!penCallback.isRawDrawing()){
+                if (!penCallback.isRawDrawing()) {
                     deletePage();
                 }
             }
+
             @Override
             public void onSwipeLeft() {
-                if (!penCallback.isRawDrawing()){
+                if (!penCallback.isRawDrawing()) {
                     updatePage(true);
                 }
             }
+
             @Override
             public void onSwipeRight() {
-                if (!penCallback.isRawDrawing()){
+                if (!penCallback.isRawDrawing()) {
                     updatePage(false);
                 }
             }
+
             @Override
             public void onSwipeTop() {
-                if (!penCallback.isRawDrawing()){
+                if (!penCallback.isRawDrawing()) {
                     addPage();
                 }
             }
@@ -128,13 +126,13 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         currentdatestring = getIntent().getStringExtra("date-string");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMMM-yyyy");
-        currentdate = LocalDate.parse(currentdatestring,formatter);
+        currentdate = LocalDate.parse(currentdatestring, formatter);
 
         daypage = 1;
         daypageCount = countDayPages();
 
         datebox = findViewById(R.id.date_text);
-        datebox.setText(currentdate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + String.valueOf(daypage) + "/" + String.valueOf(daypageCount)+")");
+        datebox.setText(currentdate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + daypage + "/" + daypageCount + ")");
         filename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + daypage + ".png";
         // initialise surface
         initSurfaceView();
@@ -161,30 +159,22 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-
-        switch(v.getId()) {
-            case R.id.back_button:
-                onBackPressed();
-                break;
-            case R.id.nextpage:
-                updatePage(true);
-                break;
-            case R.id.prevpage:
-                updatePage(false);
-                break;
-            case R.id.addpage:
-                addPage();
-                break;
-            case R.id.deletepage:
-                deletePage();
-                break;
-            case R.id.save:
-                savePages();
-                break;
-
-
+        int id = v.getId();
+        if (id == R.id.back_button) {
+            onBackPressed();
+        } else if (id == R.id.nextpage) {
+            updatePage(true);
+        } else if (id == R.id.prevpage) {
+            updatePage(false);
+        } else if (id == R.id.addpage) {
+            addPage();
+        } else if (id == R.id.deletepage) {
+            deletePage();
+        } else if (id == R.id.save) {
+            savePages();
         }
     }
+
     public void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
@@ -193,13 +183,12 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event){
+    public boolean onTouchEvent(MotionEvent event) {
         if (this.mDetector.onTouchEvent(event)) {
             return true;
         }
         return super.onTouchEvent(event);
     }
-
 
 
     @Override
@@ -213,13 +202,15 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
             binding.writerview.saveBitmap();
 
     }
-    public void onDestroy(){
+
+    public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
         if (penCallback.needsSave())
             binding.writerview.saveBitmap();
 
     }
+
     private void initSurfaceView() {
 
         binding.writerview.setBackground(R.drawable.page_bkgrnd);
@@ -228,7 +219,7 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
 
         final SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
+            public void surfaceCreated(@NonNull SurfaceHolder holder) {
 //                Rect limit = new Rect();
                 Rect limit = new Rect();
                 binding.writerview.getGlobalVisibleRect(limit);
@@ -239,11 +230,11 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
             }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
+            public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
             }
         };
         binding.writerview.getHolder().addCallback(surfaceCallback);
@@ -258,7 +249,7 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         touchHelper.setStrokeWidth(STROKE_WIDTH);
         touchHelper.setStrokeStyle(TouchHelper.STROKE_STYLE_MARKER);
         touchHelper.setStrokeColor(Color.BLACK);
-        touchHelper.setLimitRect(limitRectList, new ArrayList<Rect>())
+        touchHelper.setLimitRect(limitRectList, new ArrayList<>())
                 .openRawDrawing();
 
         touchHelper.setRawDrawingEnabled(false);
@@ -270,20 +261,14 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
-    private int countDayPages()
-    {
+    private int countDayPages() {
         File dir = getExternalFilesDir(filepath);
-        File [] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.contains(currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-            }
-        });
-
-        return max(files.length,1);
+        File[] files = dir.listFiles((dir1, name) ->
+                name.contains(currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
+        return max(files.length, 1);
     }
-    private void updatePage(boolean forward)
-    {
+
+    private void updatePage(boolean forward) {
         touchHelper.setRawDrawingEnabled(false);
         touchHelper.setRawDrawingRenderEnabled(false);
         touchHelper.closeRawDrawing();
@@ -292,39 +277,36 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         if (penCallback.needsSave())
             binding.writerview.saveBitmap();
 
-        if (forward){
-            if (daypage < daypageCount){
+        if (forward) {
+            if (daypage < daypageCount) {
                 daypage++;
-            }
-            else{
-                daypage=1;
+            } else {
+                daypage = 1;
                 currentdate = currentdate.plusDays(1);
                 daypageCount = countDayPages();
             }
 
-        }
-        else {
-            if (daypage > 1){
+        } else {
+            if (daypage > 1) {
                 daypage--;
-            }
-            else{
+            } else {
                 currentdate = currentdate.plusDays(-1);
                 daypageCount = countDayPages();
-                daypage=daypageCount;
+                daypage = daypageCount;
             }
         }
 
 
         datebox = findViewById(R.id.date_text);
-        datebox.setText(currentdate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + String.valueOf(daypage) + "/" + String.valueOf(daypageCount)+")");
+        datebox.setText(currentdate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + daypage + "/" + daypageCount + ")");
 
-        filename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(daypage) + ".png";
+        filename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + daypage + ".png";
         binding.writerview.setFilename(filename);
         binding.writerview.redrawSurface();
         startTouchHelper();
     }
 
-    private void addPage(){
+    private void addPage() {
         // add a page to the end and move forward
 
         penCallback.setNeedsSave(true);
@@ -334,7 +316,7 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private void deletePage(){
+    private void deletePage() {
         // delete a page
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -350,36 +332,34 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
             try {
                 File externalFile;
                 externalFile = new File(getExternalFilesDir(filepath), filename);
-                if (externalFile.exists())
-                {
+                if (externalFile.exists()) {
                     externalFile.delete();
                 }
 
                 for (int i = daypage; i < daypageCount; i++) {
                     System.out.println(i);
-                    String newfilename =currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(i) + ".png";
+                    String newfilename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(i) + ".png";
 
-                    String oldfilename =currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(i+1) + ".png";
+                    String oldfilename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(i + 1) + ".png";
                     externalFile = new File(getExternalFilesDir(filepath), oldfilename);
                     File newExternalFile = new File(getExternalFilesDir(filepath), newfilename);
-                    if (externalFile.exists())
-                    {
+                    if (externalFile.exists()) {
                         externalFile.renameTo(newExternalFile);
 
                     }
 
                 }
                 penCallback.setNeedsSave(false);
-                if (daypageCount!=1)
+                if (daypageCount != 1)
                     daypageCount--;
 
-                if (deletePage!=1)
+                if (deletePage != 1)
                     daypage--;
 
                 datebox = findViewById(R.id.date_text);
-                datebox.setText(currentdate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + String.valueOf(daypage) + "/" + String.valueOf(daypageCount)+")");
+                datebox.setText(currentdate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + daypage + "/" + daypageCount + ")");
 
-                filename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(daypage) + ".png";
+                filename = currentdate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + daypage + ".png";
                 binding.writerview.setFilename(filename);
                 binding.writerview.redrawSurface();
 
@@ -397,44 +377,26 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private void savePages(){
+    private void savePages() {
         // let the user choose a time frame for export then export to pdf
         binding.writerview.redrawSurface();
         binding.writerview.saveBitmap();
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MaterialThemeDialog);
-        String item[] = { getResources().getString(R.string.day),  getResources().getString(R.string.month),  getResources().getString(R.string.year)};
+        String[] item = {getResources().getString(R.string.day), getResources().getString(R.string.month), getResources().getString(R.string.year)};
 
         final int[] timeframe = {0};
-        builder.setTitle( getResources().getString(R.string.export_title))
-                .setSingleChoiceItems(item, 0,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                timeframe[0] = i;
-                            }
-
-
-                        })
+        builder.setTitle(getResources().getString(R.string.export_title))
+                .setSingleChoiceItems(item, 0, (dialogInterface, i) -> timeframe[0] = i)
                 // Set the action buttons
-                .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        try {
-                            writeToPDF(timeframe[0]);
-                        } catch (FileNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                        dialog.dismiss();
-
+                .setPositiveButton(getResources().getString(R.string.ok), (dialog, id) -> {
+                    try {
+                        writeToPDF(timeframe[0]);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
                     }
+                    dialog.dismiss();
                 })
-                .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-
-                    }
-                });
+                .setNegativeButton(getResources().getString(R.string.cancel), (dialog, id) -> dialog.dismiss());
 
         AlertDialog alert = builder.create();
         alert.setOnShowListener(arg0 -> {
@@ -447,13 +409,12 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void writeToPDF(int timeframe) throws FileNotFoundException {
-
         // this code makes a pdf from the pages of the diary and opens it
         Toast.makeText(this, getResources().getString(R.string.export_in_progress), Toast.LENGTH_LONG).show();
 
-        LocalDate startDate = currentdate;
-        LocalDate endDate = currentdate;
-        String outputFilename = "";
+        LocalDate startDate;
+        LocalDate endDate;
+        String outputFilename;
 
         switch (timeframe) {
             case 0:
@@ -470,10 +431,11 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
                 startDate = currentdate.with(firstDayOfYear());
                 endDate = currentdate.with(lastDayOfYear());
                 outputFilename = "Diary-" + currentdate.format(DateTimeFormatter.ofPattern("yyyy")) + ".pdf";
-
                 break;
-
-
+            default:
+                startDate = currentdate;
+                endDate = currentdate;
+                outputFilename = "";
         }
 
         PdfDocument pdfDocument = new PdfDocument();
@@ -485,21 +447,16 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         PdfDocument.Page startPage;
 
         for (LocalDate printDate = startDate; !printDate.isAfter(endDate); printDate = printDate.plusDays(1)) {
-
             File dir = getExternalFilesDir(filepath);
             LocalDate finalPrintDate = printDate;
-            File[] files = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.contains(finalPrintDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-                }
-            });
+            File[] files = dir.listFiles((dir1, name) ->
+                    name.contains(finalPrintDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"))));
 
             int length = files.length;
 
             for (int printPage = 1; printPage <= length; printPage++) {
-                String pageTitle = printDate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + String.valueOf(printPage) + "/" + String.valueOf(length) + ")";
-                String printfilename = printDate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + String.valueOf(printPage) + ".png";
+                String pageTitle = printDate.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy (")) + printPage + "/" + length + ")";
+                String printfilename = printDate.format(DateTimeFormatter.ofPattern("yyyyMMdd-")) + printPage + ".png";
 
 
                 File bitmapFile = new File(getExternalFilesDir(filepath), printfilename);
@@ -542,10 +499,9 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
 
         Uri path = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
 
-        try{
+        try {
             pdfDocument.writeTo(resolver.openOutputStream(path));
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         pdfDocument.close();
@@ -557,9 +513,5 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         startActivity(intent);
-        return;
     }
-
-
-
 }

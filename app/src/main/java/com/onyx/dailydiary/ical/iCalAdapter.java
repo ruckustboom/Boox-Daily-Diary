@@ -14,23 +14,22 @@ import com.onyx.dailydiary.R;
 
 import java.util.ArrayList;
 
-public class iCalAdapter extends RecyclerView.Adapter<iCalAdapter.CustomViewHolder>
-{
+public class iCalAdapter extends RecyclerView.Adapter<iCalAdapter.CustomViewHolder> {
     private static final String TAG = iCalAdapter.class.getSimpleName();
 
     private final iCalAdapter.OnItemListener onItemListener;
     ArrayList<ArrayList<String>> calendarList;
 
-    public iCalAdapter(iCalAdapter.OnItemListener onItemListener, ArrayList<ArrayList<String>> calendarList)
-    {
-            this.onItemListener = onItemListener;
-            this.calendarList = calendarList;
+    public iCalAdapter(iCalAdapter.OnItemListener onItemListener, ArrayList<ArrayList<String>> calendarList) {
+        this.onItemListener = onItemListener;
+        this.calendarList = calendarList;
     }
 
+    @NonNull
     @Override
     public iCalAdapter.CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.ics_text_row_item
-                , viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.ics_text_row_item, viewGroup, false);
         return new CustomViewHolder(view);
     }
 
@@ -43,12 +42,8 @@ public class iCalAdapter extends RecyclerView.Adapter<iCalAdapter.CustomViewHold
     }
 
 
-//    public void addCalendar(String cal_name, String cal_ics)
-//    {
-//
+//    public void addCalendar(String cal_name, String cal_ics) {
 //        notifyItemInserted(calendarList.size() + 1);
-//
-//
 //    }
 
 
@@ -57,15 +52,13 @@ public class iCalAdapter extends RecyclerView.Adapter<iCalAdapter.CustomViewHold
         return calendarList.size();
     }
 
-    public interface  OnItemListener
-    {
+    public interface OnItemListener {
         void onItemClick(int position, CustomViewHolder holder);
     }
 
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private TextView textViewCalName;
-        private TextView textViewICS;
+        private final TextView textViewCalName;
+        private final TextView textViewICS;
 
 
         public CustomViewHolder(View itemView) {
@@ -81,7 +74,6 @@ public class iCalAdapter extends RecyclerView.Adapter<iCalAdapter.CustomViewHold
         @Override
         public void onClick(View view) {
             onItemListener.onItemClick(getAdapterPosition(), this);
-
         }
     }
-    }
+}

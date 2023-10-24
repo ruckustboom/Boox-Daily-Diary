@@ -4,6 +4,8 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+import androidx.annotation.NonNull;
+
 public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
     public static final int SWIPE_VELOCITY_THRESHOLD = 1000;
@@ -11,35 +13,34 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
     private static final String TAG = GestureListener.class.getSimpleName();
 
     @Override
-    public boolean onDown(MotionEvent event) {
+    public boolean onDown(@NonNull MotionEvent event) {
         return true;
     }
 
     @Override
-    public boolean onFling(MotionEvent event1, MotionEvent event2,
-                           float velocityX, float velocityY) {
-
+    public boolean onFling(
+            MotionEvent event1,
+            MotionEvent event2,
+            float velocityX,
+            float velocityY
+    ) {
         float diffY = event2.getY() - event1.getY();
         float diffX = event2.getX() - event1.getX();
-        Log.d(TAG, "onFling: " + diffY + " " +diffX +  " " + velocityX + " " +velocityY);
+        Log.d(TAG, "onFling: " + diffY + " " + diffX + " " + velocityX + " " + velocityY);
 
-        if (Math.abs(diffX) > Math.abs(diffY)){
-
-            if (Math.abs(diffX)> SWIPE_THRESHOLD && Math.abs(velocityX)>SWIPE_VELOCITY_THRESHOLD){
-                if (diffX>0){
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                if (diffX > 0) {
                     onSwipeRight();
-                }
-                else{
+                } else {
                     onSwipeLeft();
                 }
             }
-        }
-        else{
-            if (Math.abs(diffY)> SWIPE_THRESHOLD && Math.abs(velocityY)>SWIPE_VELOCITY_THRESHOLD){
-                if (diffY>0){
+        } else {
+            if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                if (diffY > 0) {
                     onSwipeBottom();
-                }
-                else{
+                } else {
                     onSwipeTop();
                 }
             }
@@ -48,20 +49,20 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
         return true;
     }
 
-    public void onSwipeLeft(){
+    public void onSwipeLeft() {
         Log.d(TAG, "onSwipeLeft");
 
     }
 
-    public void onSwipeRight(){
+    public void onSwipeRight() {
         Log.d(TAG, "onSwipeRight");
     }
 
-    public void onSwipeBottom(){
+    public void onSwipeBottom() {
         Log.d(TAG, "onSwipeBottom");
     }
 
-    public void onSwipeTop(){
+    public void onSwipeTop() {
         Log.d(TAG, "onSwipeTop");
     }
 

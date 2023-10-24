@@ -22,7 +22,7 @@ import java.util.List;
 
 public class PenCallback extends RawInputCallback {
     private static final String TAG = PenCallback.class.getSimpleName();
-    private List<TouchPoint> points = new ArrayList<>();
+    private final List<TouchPoint> points = new ArrayList<>();
     private RxManager rxManager;
 
     private final List<BitmapView> views;
@@ -53,8 +53,7 @@ public class PenCallback extends RawInputCallback {
         return needsSave;
     }
 
-    public void setNeedsSave(boolean needsSave)
-    {
+    public void setNeedsSave(boolean needsSave) {
         this.needsSave = needsSave;
     }
 
@@ -65,10 +64,10 @@ public class PenCallback extends RawInputCallback {
     @Override
     public void onBeginRawDrawing(boolean b, TouchPoint touchPoint) {
         Log.d(TAG, "onBeginRawDrawing");
-        minTouchX = (int)touchPoint.x;
-        maxTouchX = (int)touchPoint.x;
-        minTouchY = (int)touchPoint.y;
-        maxTouchY = (int)touchPoint.y;
+        minTouchX = (int) touchPoint.x;
+        maxTouchX = (int) touchPoint.x;
+        minTouchY = (int) touchPoint.y;
+        maxTouchY = (int) touchPoint.y;
         points.clear();
         rawDrawing = true;
     }
@@ -83,13 +82,11 @@ public class PenCallback extends RawInputCallback {
         // restart the touch helper - this is needed to
         // keep the navigation ball working
         lastDraw = currentTimeMillis();
-        if (!redrawRunning)
-        {
+        if (!redrawRunning) {
             redrawRunning = true;
             Runnable thread = () -> {
                 long currentTime = currentTimeMillis();
-                while (currentTime<lastDraw + refreshInterval)
-                {
+                while (currentTime < lastDraw + refreshInterval) {
                     currentTime = currentTimeMillis();
                 }
 
@@ -107,24 +104,24 @@ public class PenCallback extends RawInputCallback {
     @Override
     public void onRawDrawingTouchPointMoveReceived(TouchPoint touchPoint) {
         lastDraw = currentTimeMillis();
-        if ((int)touchPoint.x<minTouchX)
-            minTouchX = (int)touchPoint.x;
-        if ((int)touchPoint.x>maxTouchX)
-            maxTouchX = (int)touchPoint.x;
-        if ((int)touchPoint.y<minTouchY)
-            minTouchY = (int)touchPoint.y;
-        if ((int)touchPoint.y>maxTouchY)
-            maxTouchY = (int)touchPoint.y;
+        if ((int) touchPoint.x < minTouchX)
+            minTouchX = (int) touchPoint.x;
+        if ((int) touchPoint.x > maxTouchX)
+            maxTouchX = (int) touchPoint.x;
+        if ((int) touchPoint.y < minTouchY)
+            minTouchY = (int) touchPoint.y;
+        if ((int) touchPoint.y > maxTouchY)
+            maxTouchY = (int) touchPoint.y;
     }
 
     @Override
     public void onRawDrawingTouchPointListReceived(TouchPointList touchPointList) {
-        needsSave=true;
+        needsSave = true;
 
-        for (BitmapView view:views) {
-            view.drawToBitmap(touchPointList.getPoints());    
+        for (BitmapView view : views) {
+            view.drawToBitmap(touchPointList.getPoints());
         }
-        
+
     }
 
     @Override
@@ -132,16 +129,14 @@ public class PenCallback extends RawInputCallback {
         Log.d(TAG, "onBeginRawErasing");
 
         points.clear();
-        minTouchX = (int)touchPoint.x;
-        maxTouchX = (int)touchPoint.x;
-        minTouchY = (int)touchPoint.y;
-        maxTouchY = (int)touchPoint.y;
+        minTouchX = (int) touchPoint.x;
+        maxTouchX = (int) touchPoint.x;
+        minTouchY = (int) touchPoint.y;
+        maxTouchY = (int) touchPoint.y;
         rawDrawing = true;
 //         for (BitmapView view:views) {
 //             view.redrawSurface();
 //         }
-        
-        
     }
 
     @Override
@@ -155,10 +150,10 @@ public class PenCallback extends RawInputCallback {
         for (TouchPoint point : pointList) {
             touchPointList.add(point);
         }
-        needsSave=true;
-        for (BitmapView view:views) {
+        needsSave = true;
+        for (BitmapView view : views) {
             view.eraseBitmap(pointList);
-            Rect eraseRect = new Rect(minTouchX,minTouchY,maxTouchX,maxTouchY);
+            Rect eraseRect = new Rect(minTouchX, minTouchY, maxTouchX, maxTouchY);
             Rect limit = new Rect();
             Point offset = new Point();
             view.getGlobalVisibleRect(limit, offset);
@@ -171,14 +166,14 @@ public class PenCallback extends RawInputCallback {
     @Override
     public void onRawErasingTouchPointMoveReceived(TouchPoint touchPoint) {
         points.add(touchPoint);
-        if ((int)touchPoint.x<minTouchX)
-            minTouchX = (int)touchPoint.x;
-        if ((int)touchPoint.x>maxTouchX)
-            maxTouchX = (int)touchPoint.x;
-        if ((int)touchPoint.y<minTouchY)
-            minTouchY = (int)touchPoint.y;
-        if ((int)touchPoint.y>maxTouchY)
-            maxTouchY = (int)touchPoint.y;
+        if ((int) touchPoint.x < minTouchX)
+            minTouchX = (int) touchPoint.x;
+        if ((int) touchPoint.x > maxTouchX)
+            maxTouchX = (int) touchPoint.x;
+        if ((int) touchPoint.y < minTouchY)
+            minTouchY = (int) touchPoint.y;
+        if ((int) touchPoint.y > maxTouchY)
+            maxTouchY = (int) touchPoint.y;
 
         if (points.size() >= 50) {
             List<TouchPoint> pointList = new ArrayList<>(points);
@@ -187,11 +182,11 @@ public class PenCallback extends RawInputCallback {
             for (TouchPoint point : pointList) {
                 touchPointList.add(point);
             }
-            needsSave=true;
+            needsSave = true;
 
-            for (BitmapView view:views) {
+            for (BitmapView view : views) {
                 view.eraseBitmap(pointList);
-                Rect eraseRect = new Rect(minTouchX,minTouchY,maxTouchX,maxTouchY);
+                Rect eraseRect = new Rect(minTouchX, minTouchY, maxTouchX, maxTouchY);
                 Rect limit = new Rect();
                 Point offset = new Point();
                 view.getGlobalVisibleRect(limit, offset);
@@ -205,13 +200,13 @@ public class PenCallback extends RawInputCallback {
     @Override
     public void onRawErasingTouchPointListReceived(TouchPointList touchPointList) {
         Log.d(TAG, "onRawErasingTouchPointListReceived");
-        needsSave=true;
+        needsSave = true;
 
 
-        for (BitmapView view:views) {
+        for (BitmapView view : views) {
             view.eraseBitmap(touchPointList.getPoints());
 //            view.redrawSurface();
-            Rect eraseRect = new Rect(minTouchX,minTouchY,maxTouchX,maxTouchY);
+            Rect eraseRect = new Rect(minTouchX, minTouchY, maxTouchX, maxTouchY);
             Rect limit = new Rect();
             Point offset = new Point();
             view.getGlobalVisibleRect(limit, offset);
@@ -228,21 +223,23 @@ public class PenCallback extends RawInputCallback {
         Log.d(TAG, "onPenUpRefresh " + rawDrawing);
 
 
-        for (BitmapView view:views) {
-            RectF viewRect = new RectF(refreshRect.left,refreshRect.top,refreshRect.right,refreshRect.bottom);
+        for (BitmapView view : views) {
+            RectF viewRect = new RectF(refreshRect.left, refreshRect.top, refreshRect.right, refreshRect.bottom);
 
             Rect limit = new Rect();
             Point offset = new Point();
             view.getGlobalVisibleRect(limit, offset);
             viewRect.offset(-offset.x, -offset.y);
 
-            getRxManager().enqueue(new PartialRefreshRequest(mContext, view, viewRect)
+            getRxManager().enqueue(
+                    new PartialRefreshRequest(mContext, view, viewRect)
                             .setBitmap(view.getBitmap()),
                     new RxCallback<PartialRefreshRequest>() {
                         @Override
                         public void onNext(@NonNull PartialRefreshRequest partialRefreshRequest) {
                         }
-                    });
+                    }
+            );
         }
     }
 
@@ -253,5 +250,4 @@ public class PenCallback extends RawInputCallback {
         }
         return rxManager;
     }
-};
-
+}

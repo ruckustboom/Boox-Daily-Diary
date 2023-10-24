@@ -1,14 +1,7 @@
 package com.onyx.dailydiary;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,18 +13,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-// import android.widget.Toolbar;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.onyx.android.sdk.data.note.TouchPoint;
-import com.onyx.android.sdk.pen.RawInputCallback;
 import com.onyx.android.sdk.pen.TouchHelper;
-import com.onyx.android.sdk.rx.RxManager;
 import com.onyx.dailydiary.calendar.CalendarAdapter;
 import com.onyx.dailydiary.calendar.CalendarViewHolder;
 import com.onyx.dailydiary.databinding.ActivityMainBinding;
@@ -42,27 +30,30 @@ import com.onyx.dailydiary.utils.GlobalDeviceReceiver;
 import com.onyx.dailydiary.utils.PenCallback;
 import com.onyx.dailydiary.writer.WriterActivity;
 
-public class MainActivity extends AppCompatActivity implements CalendarAdapter.OnItemListener, View.OnClickListener
-{
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements CalendarAdapter.OnItemListener, View.OnClickListener {
     private ActivityMainBinding binding;
     private TextView monthText;
     private RecyclerView calendarRecyclerView;
     private LocalDate selectedDate;
     public TouchHelper touchHelper;
 
-
-
     private CalendarViewHolder lastHolder = null;
 
     private final float STROKE_WIDTH = 4.0f;
     private String DayofMonth;
-    private List<Rect> limitRectList = new ArrayList<>();
+    private final List<Rect> limitRectList = new ArrayList<>();
     private static final String TAG = MainActivity.class.getSimpleName();
     private iCalParser parser;
-    private GlobalDeviceReceiver deviceReceiver = new GlobalDeviceReceiver();
+    private final GlobalDeviceReceiver deviceReceiver = new GlobalDeviceReceiver();
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         deviceReceiver.enable(this, true);
@@ -78,18 +69,16 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
         List<BitmapView> viewList = new ArrayList<>();
         viewList.add(binding.taskssurfaceview);
         viewList.add(binding.summarysurfaceview);
-        PenCallback penCallback = new PenCallback(this,viewList);
+        PenCallback penCallback = new PenCallback(this, viewList);
         touchHelper = TouchHelper.create(getWindow().getDecorView().getRootView(), penCallback);
         touchHelper.debugLog(false);
         touchHelper.setRawInputReaderEnable(true);
         penCallback.setTouchHelper(touchHelper);
 
-        String summaryFilename =  getCurrentDateString() + ".png";
+        String summaryFilename = getCurrentDateString() + ".png";
         String tasksFilename = "tasks.png";
         initSurfaceView(binding.taskssurfaceview, tasksFilename, R.drawable.tasks_bkgrnd);
-        initSurfaceView(binding.summarysurfaceview,summaryFilename, R.drawable.summary_bkgrnd);
-
-
+        initSurfaceView(binding.summarysurfaceview, summaryFilename, R.drawable.summary_bkgrnd);
 
         Button clear_all = (Button) view.findViewById(R.id.clearsummary);
         clear_all.setOnClickListener(this);
@@ -100,14 +89,12 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
         parser = new iCalParser(getApplicationContext());
         parser.loadCalendars();
         setMonthView();
-
-
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-
     }
 
     @Override
@@ -121,55 +108,45 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
         binding.summarysurfaceview.redrawSurface();
         binding.taskssurfaceview.saveBitmap();
         binding.summarysurfaceview.saveBitmap();
-
     }
 
     @Override
     public void onResume() {
-
         Log.d(TAG, "onResume");
         super.onResume();
         startTouchHelper();
-
-        return;
     }
 
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
-            case R.id.clear_tasks:
-                binding.taskssurfaceview.resetBitmap();
-                binding.taskssurfaceview.redrawSurface();
-                break;
-            case R.id.clearsummary:
-                binding.summarysurfaceview.resetBitmap();
-                binding.summarysurfaceview.redrawSurface();
-                break;
-            case R.id.opendiary:
-                binding.taskssurfaceview.saveBitmap();
-                binding.summarysurfaceview.saveBitmap();
-                openPage();
-                break;
+        int id = view.getId();
+        if (id == R.id.clear_tasks) {
+            binding.taskssurfaceview.resetBitmap();
+            binding.taskssurfaceview.redrawSurface();
+        } else if (id == R.id.clearsummary) {
+            binding.summarysurfaceview.resetBitmap();
+            binding.summarysurfaceview.redrawSurface();
+        } else if (id == R.id.opendiary) {
+            binding.taskssurfaceview.saveBitmap();
+            binding.summarysurfaceview.saveBitmap();
+            openPage();
         }
         Log.d(TAG, "onClick");
     }
 
     @Override
-    public void onItemClick(int position, String dayText, CalendarViewHolder holder)
-    {
-        if(!dayText.equals(""))
-        {
-
+    public void onItemClick(int position, String dayText, CalendarViewHolder holder) {
+        if (!dayText.equals("")) {
             binding.summarysurfaceview.saveBitmap();
 
             DayofMonth = dayText;
-            String summaryFilename =  getCurrentDateString() + ".png";
+            String summaryFilename = getCurrentDateString() + ".png";
 
             binding.summarysurfaceview.setFilename(summaryFilename);
             binding.summarysurfaceview.redrawSurface();
 
-            if (lastHolder!=null){
+            if (lastHolder != null) {
                 lastHolder.layout.setBackgroundColor(Color.WHITE);
                 lastHolder.headerlayout.setBackgroundColor(Color.WHITE);
                 lastHolder.eventsText.setTextColor(Color.BLACK);
@@ -181,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
             holder.headerlayout.setBackgroundColor(Color.DKGRAY);
 
             lastHolder = holder;
-
         }
     }
 
@@ -194,32 +170,24 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_reload:
-                parser.sync_calendars();
-                setMonthView();
-                break;
-            case R.id.edit_calendars:
-                // opening a new intent to open calendar settings activity.
-                Intent i = new Intent(MainActivity.this, CalendarActivity.class);
-                startActivity(i);
-                break;
-            default:
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_reload) {
+            parser.sync_calendars();
+            setMonthView();
+        } else if (itemId == R.id.edit_calendars) {// opening a new intent to open calendar settings activity.
+            Intent i = new Intent(MainActivity.this, CalendarActivity.class);
+            startActivity(i);
         }
 
         return true;
     }
 
     private void initReceiver() {
-        deviceReceiver.setSystemNotificationPanelChangeListener(new GlobalDeviceReceiver.SystemNotificationPanelChangeListener() {
-            @Override
-            public void onNotificationPanelChanged(boolean open) {
-                touchHelper.setRawDrawingEnabled(!open);
-                Log.d(TAG, "onNotificationPanelChanged " + open);
-                binding.taskssurfaceview.saveBitmap();
-                binding.summarysurfaceview.saveBitmap();
-            }
+        deviceReceiver.setSystemNotificationPanelChangeListener(open -> {
+            touchHelper.setRawDrawingEnabled(!open);
+            Log.d(TAG, "onNotificationPanelChanged " + open);
+            binding.taskssurfaceview.saveBitmap();
+            binding.summarysurfaceview.saveBitmap();
         }).setSystemScreenOnListener(new GlobalDeviceReceiver.SystemScreenOnListener() {
             @Override
             public void onScreenOn() {
@@ -227,30 +195,25 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
                 selectedDate = LocalDate.now();
                 setMonthView();
             }
+
             @Override
             public void onScreenOff() {
                 Log.d(TAG, "onScreenOff");
                 onPause();
-               }
+            }
         });
     }
 
-
-
-
     private void initSurfaceView(BitmapView surfaceView, String filename, int background) {
-
         surfaceView.setBackground(background);
         String filepath = "DailyNotes";
         surfaceView.setFilepath(filepath);
         surfaceView.setFilename(filename);
         Log.d(TAG, "initSurfaceView");
 
-
-
         final SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
+            public void surfaceCreated(@NonNull SurfaceHolder holder) {
                 Log.d(TAG, "Tasks surfaceCreated");
 
                 Rect limit = new Rect();
@@ -262,10 +225,9 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
             }
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
                 Log.d(TAG, "Tasks surfaceChanged");
             }
-
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
@@ -276,9 +238,7 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
     }
 
 
-
-    private void initWidgets()
-    {
+    private void initWidgets() {
         calendarRecyclerView = findViewById(R.id.calendarRecyclerView);
         monthText = findViewById(R.id.monthTV);
     }
@@ -291,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
         touchHelper.setStrokeWidth(STROKE_WIDTH);
         touchHelper.setStrokeStyle(TouchHelper.STROKE_STYLE_MARKER);
         touchHelper.setStrokeColor(Color.BLACK);
-        touchHelper.setLimitRect(limitRectList, new ArrayList<Rect>())
+        touchHelper.setLimitRect(limitRectList, new ArrayList<>())
                 .openRawDrawing();
 
         touchHelper.setRawDrawingEnabled(false);
@@ -300,30 +260,25 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
         touchHelper.setRawDrawingEnabled(true);
         touchHelper.enableFingerTouch(true);
         touchHelper.setRawDrawingRenderEnabled(true);
-
     }
 
-    public void openPage(){
+    public void openPage() {
         try {
             Intent intent = new Intent(MainActivity.this, WriterActivity.class);
             intent.putExtra("date-string", getCurrentDateString()); //Optional parameters
             intent.putExtra("stroke-width", STROKE_WIDTH);
             startActivity(intent);
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, "Unable to open daily notes.", Toast.LENGTH_LONG).show();
         }
-
     }
 
-    public String getCurrentDateString(){
-        String currentDate =  DayofMonth + "-" + monthYearFromDate(selectedDate);
-        return currentDate;
+    public String getCurrentDateString() {
+        return DayofMonth + "-" + monthYearFromDate(selectedDate);
     }
 
-    private void setMonthView()
-    {
+    private void setMonthView() {
         Log.d(TAG, "setMonthView");
 
         monthText.setText(monthFromDate(selectedDate));
@@ -340,66 +295,52 @@ public class MainActivity extends AppCompatActivity implements CalendarAdapter.O
         calendarRecyclerView.setAdapter(calendarAdapter);
 
         calendarAdapter.notifyDataSetChanged();
-
     }
 
-    public interface HolderListener
-    {
+    public interface HolderListener {
         void onTodayHolderCreated(CalendarViewHolder holder);
     }
 
-    void onTodayHolderCreated(CalendarViewHolder holder){
+    void onTodayHolderCreated(CalendarViewHolder holder) {
         lastHolder = holder;
     }
 
-    private ArrayList<String> daysInMonthArray(LocalDate date)
-    {
+    private ArrayList<String> daysInMonthArray(LocalDate date) {
         ArrayList<String> daysInMonthArray = new ArrayList<>();
         YearMonth yearMonth = YearMonth.from(date);
 
         int daysInMonth = yearMonth.lengthOfMonth();
 
         LocalDate firstOfMonth = selectedDate.withDayOfMonth(1);
-        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue() ;
+        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
 
-        for(int i = 1; i <= 42; i++)
-        {
-            if(i < dayOfWeek || i >= daysInMonth + dayOfWeek)
-            {
+        for (int i = 1; i <= 42; i++) {
+            if (i < dayOfWeek || i >= daysInMonth + dayOfWeek) {
                 daysInMonthArray.add("");
-            }
-            else
-            {
+            } else {
                 daysInMonthArray.add(String.valueOf(i - dayOfWeek + 1));
             }
         }
-        return  daysInMonthArray;
+        return daysInMonthArray;
     }
 
-    private String monthYearFromDate(LocalDate date)
-    {
+    private String monthYearFromDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM-yyyy");
         return date.format(formatter);
     }
 
-    private String monthFromDate(LocalDate date)
-    {
+    private String monthFromDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
         return date.format(formatter);
     }
 
-    public void previousMonthAction(View view)
-    {
+    public void previousMonthAction(View view) {
         selectedDate = selectedDate.minusMonths(1);
         setMonthView();
     }
 
-    public void nextMonthAction(View view)
-    {
+    public void nextMonthAction(View view) {
         selectedDate = selectedDate.plusMonths(1);
         setMonthView();
     }
-
 }
-
-
