@@ -198,21 +198,20 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         touchHelper.setRawDrawingEnabled(false);
         touchHelper.setRawDrawingRenderEnabled(false);
         touchHelper.closeRawDrawing();
-        if (penCallback.needsSave())
+        if (penCallback.isDirty()) {
             binding.writerview.saveBitmap();
-
+        }
     }
 
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        if (penCallback.needsSave())
+        if (penCallback.isDirty()) {
             binding.writerview.saveBitmap();
-
+        }
     }
 
     private void initSurfaceView() {
-
         binding.writerview.setBackground(R.drawable.page_bkgrnd);
         binding.writerview.setFilepath(filepath);
         binding.writerview.setFilename(filename);
@@ -257,7 +256,6 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         touchHelper.setRawDrawingEnabled(true);
         touchHelper.enableFingerTouch(true);
         touchHelper.setRawDrawingRenderEnabled(true);
-
     }
 
 
@@ -274,8 +272,9 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
         touchHelper.closeRawDrawing();
 
         // move forward or backwards in the diary
-        if (penCallback.needsSave())
+        if (penCallback.isDirty()) {
             binding.writerview.saveBitmap();
+        }
 
         if (forward) {
             if (daypage < daypageCount) {
@@ -309,7 +308,7 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
     private void addPage() {
         // add a page to the end and move forward
 
-        penCallback.setNeedsSave(true);
+        penCallback.setDirty(true);
         binding.writerview.saveBitmap();
         daypageCount++;
         updatePage(true);
@@ -345,11 +344,9 @@ public class WriterActivity extends AppCompatActivity implements View.OnClickLis
                     File newExternalFile = new File(getExternalFilesDir(filepath), newfilename);
                     if (externalFile.exists()) {
                         externalFile.renameTo(newExternalFile);
-
                     }
-
                 }
-                penCallback.setNeedsSave(false);
+                penCallback.setDirty(false);
                 if (daypageCount != 1)
                     daypageCount--;
 
