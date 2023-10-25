@@ -1,191 +1,145 @@
-package com.onyx.dailydiary.ical;
+package com.onyx.dailydiary.ical
 
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageButton
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.onyx.dailydiary.R
+import com.onyx.dailydiary.ical.iCalAdapter.CustomViewHolder
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileWriter
+import java.io.IOException
+import java.io.InputStreamReader
+import kotlin.random.Random
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.onyx.dailydiary.R;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Random;
-
-public class CalendarActivity extends AppCompatActivity implements iCalAdapter.OnItemListener, View.OnClickListener {
-    private static final String TAG = CalendarActivity.class.getSimpleName();
-
-    private final String filepath = "Calendars";
-    private final String filename = "calendar_list.txt";
-
-
-    private iCalAdapter mAdapter;
-
-    private EditText cal_name;
-    private EditText cal_url;
-    private final ArrayList<ArrayList<String>> calendarList = new ArrayList<>();
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calendars);
-        getSupportActionBar().hide();
-        initData();
-        initRecyclerView();
-
-        ImageButton back_button = findViewById(R.id.back_button);
-        back_button.setOnClickListener(this);
-
-        ImageButton add_button = findViewById(R.id.cal_add_button);
-        add_button.setOnClickListener(this);
-
-        cal_name = findViewById(R.id.name_text_input);
-        cal_url = findViewById(R.id.url_text_input);
+class CalendarActivity : AppCompatActivity(), iCalAdapter.OnItemListener, View.OnClickListener {
+    private lateinit var mAdapter: iCalAdapter
+    private lateinit var calName: EditText
+    private lateinit var calUrl: EditText
+    private val calendarList = mutableListOf<List<String>>()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_calendars)
+        supportActionBar!!.hide()
+        initData()
+        initRecyclerView()
+        val backButton = findViewById<ImageButton>(R.id.back_button)
+        backButton.setOnClickListener(this)
+        val addButton = findViewById<ImageButton>(R.id.cal_add_button)
+        addButton.setOnClickListener(this)
+        calName = findViewById(R.id.name_text_input)
+        calUrl = findViewById(R.id.url_text_input)
     }
 
-
-    private void initData() {
-        Log.d(TAG, "initData");
-
-
-        File calendarFile = new File(getExternalFilesDir(filepath), filename);
-
+    private fun initData() {
+        Log.d(TAG, "initData")
+        val calendarFile = File(getExternalFilesDir(FILE_PATH), FILE_NAME)
         if (calendarFile.exists()) {
-            FileInputStream is;
-            try {
-                is = new FileInputStream(calendarFile);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            val fis = try {
+                FileInputStream(calendarFile)
+            } catch (e: FileNotFoundException) {
+                throw RuntimeException(e)
             }
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String line;
+            val reader = BufferedReader(InputStreamReader(fis))
+            var line: String?
             try {
-                line = reader.readLine();
-
+                line = reader.readLine()
                 while (line != null) {
-                    String[] splitLine = line.split(",");
-
-                    if (splitLine.length == 3) {
-                        ArrayList<String> calendarLine = new ArrayList<>(3);
-                        calendarLine.add(splitLine[0]);
-                        calendarLine.add(splitLine[1]);
-                        calendarLine.add(splitLine[2]);
-                        calendarList.add(calendarLine);
+                    val splitLine =
+                        line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    if (splitLine.size == 3) {
+                        val calendarLine = ArrayList<String>(3)
+                        calendarLine.add(splitLine[0])
+                        calendarLine.add(splitLine[1])
+                        calendarLine.add(splitLine[2])
+                        calendarList.add(calendarLine)
                     }
-                    line = reader.readLine();
+                    line = reader.readLine()
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (e: IOException) {
+                throw RuntimeException(e)
             }
         }
     }
 
-    private void initRecyclerView() {
-        RecyclerView mRecentRecyclerView = (RecyclerView) findViewById(R.id.calendarICSRecyclerView);
-        mRecentRecyclerView.setHasFixedSize(false);
-        LinearLayoutManager mRecentLayoutManager = new LinearLayoutManager(this);
-        mRecentRecyclerView.setLayoutManager(mRecentLayoutManager);
-
-        mAdapter = new iCalAdapter(this, calendarList);
-
-//        RecyclerView.Adapter<CustomViewHolder> mAdapter = new RecyclerView.Adapter<CustomViewHolder>() {
-//            @Override
-//            public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-//                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.ics_text_row_item
-//                        , viewGroup, false);
-//                return new CustomViewHolder(view);
-//            }
-//
-//            @Override
-//            public void onBindViewHolder(CustomViewHolder viewHolder, int i) {
-//                viewHolder.textViewICS.setText(mItems.get(i));
-//            }
-//
-//            @Override
-//            public int getItemCount() {
-//                return mItems.size();
-//            }
-//
-//
-//        };
-        mRecentRecyclerView.setAdapter(mAdapter);
+    private fun initRecyclerView() {
+        val mRecentRecyclerView = findViewById<View>(R.id.calendarICSRecyclerView) as RecyclerView
+        mRecentRecyclerView.setHasFixedSize(false)
+        mRecentRecyclerView.layoutManager = LinearLayoutManager(this)
+        mAdapter = iCalAdapter(this, calendarList)
+        mRecentRecyclerView.adapter = mAdapter
     }
 
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == R.id.back_button) {
-//                onBackPressed();
-            finish();
-        } else if (id == R.id.cal_add_button) {
-            addCaltoList();
+    override fun onClick(view: View) {
+        when (view.id) {
+            R.id.back_button -> finish()
+            R.id.cal_add_button -> addCalToList()
         }
     }
 
-    @Override
-    protected void onPause() {
-        Log.d(TAG, "onPause");
-        super.onPause();
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy");
-        File calendarFile = new File(getExternalFilesDir(filepath), filename);
-
-        try {
-            FileWriter writer = new FileWriter(calendarFile);
-            for (int i = 0; i < calendarList.size(); i++) {
-                writer.write(calendarList.get(i).get(0) + ",");
-                writer.write(calendarList.get(i).get(1) + ",");
-                writer.write(calendarList.get(i).get(2) + "\n");
+    public override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
+        val calendarFile = File(getExternalFilesDir(FILE_PATH), FILE_NAME)
+        FileWriter(calendarFile).use {
+            val writer = FileWriter(calendarFile)
+            for (i in calendarList.indices) {
+                writer.write(calendarList[i][0] + ",")
+                writer.write(calendarList[i][1] + ",")
+                writer.write(
+                    """
+                    ${calendarList[i][2]}
+                    
+                    """.trimIndent()
+                )
             }
-            writer.close();
-        } catch (IOException ignored) {
         }
-
-        super.onDestroy();
+        super.onDestroy()
     }
 
-    private void addCaltoList() {
-        int i = calendarList.size();
-        calendarList.add(new ArrayList<>(2));
-        calendarList.get(i).add(String.valueOf(cal_name.getText()).replace(",", ""));
-        calendarList.get(i).add(String.valueOf(cal_url.getText()).replace(",", ""));
-        calendarList.get(i).add(randomFileName());
-        mAdapter.notifyItemInserted(calendarList.size());
-
-        cal_name.setText("");
-        cal_url.setText("");
+    private fun addCalToList() {
+        calendarList.add(
+            listOf(
+                calName.text.toString().replace(",", ""),
+                calUrl.text.toString().replace(",", ""),
+                randomFileName(),
+            )
+        )
+        mAdapter.notifyItemInserted(calendarList.size)
+        calName.setText("")
+        calUrl.setText("")
     }
 
-    @Override
-    public void onItemClick(int position, iCalAdapter.CustomViewHolder holder) {
-        calendarList.remove(position);
-        mAdapter.notifyItemRemoved(position);
+    override fun onItemClick(position: Int, holder: CustomViewHolder?) {
+        calendarList.removeAt(position)
+        mAdapter.notifyItemRemoved(position)
     }
 
-    private String randomFileName() {
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 10;
-        Random random = new Random();
+    private fun randomFileName(): String {
+        val generatedString = buildString {
+            repeat(RANDOM_STRING_LENGTH) {
+                appendCodePoint(Random.nextInt(26) + A_CODE_POINT)
+            }
+        }
+        return "$generatedString.ics"
+    }
 
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-
-        return generatedString + ".ics";
+    companion object {
+        private val TAG = CalendarActivity::class.java.simpleName
+        private const val FILE_PATH = "Calendars"
+        private const val FILE_NAME = "calendar_list.txt"
+        private const val RANDOM_STRING_LENGTH = 10
+        private const val A_CODE_POINT = 97
     }
 }

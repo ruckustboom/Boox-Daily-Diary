@@ -1,114 +1,69 @@
-package com.onyx.dailydiary.utils;
+package com.onyx.dailydiary.utils
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import com.onyx.android.sdk.utils.BroadcastHelper
+import com.onyx.android.sdk.utils.DeviceReceiver
 
-import com.onyx.android.sdk.utils.BroadcastHelper;
-import com.onyx.android.sdk.utils.DeviceReceiver;
-import com.onyx.android.sdk.utils.StringUtils;
+class GlobalDeviceReceiver : BroadcastReceiver() {
+    var callbacks: Callbacks? = null
 
-public class GlobalDeviceReceiver extends BroadcastReceiver {
-
-    public static final String SYSTEM_UI_DIALOG_OPEN_ACTION = DeviceReceiver.SYSTEM_UI_DIALOG_OPEN_ACTION;
-    public static final String SYSTEM_UI_DIALOG_CLOSE_ACTION = DeviceReceiver.SYSTEM_UI_DIALOG_CLOSE_ACTION;
-    public static final String SYSTEM_SCREEN_ON_ACTION = Intent.ACTION_SCREEN_ON;
-
-
-    public static final String SYSTEM_SCREEN_OFF_ACTION = Intent.ACTION_SCREEN_OFF;
-
-    public static final String DIALOG_TYPE_NOTIFICATION_PANEL = DeviceReceiver.DIALOG_TYPE_NOTIFICATION_PANEL;
-    public static final String DIALOG_TYPE = DeviceReceiver.DIALOG_TYPE;
-
-    public SystemNotificationPanelChangeListener systemNotificationPanelChangeListener;
-    public SystemScreenOnListener systemScreenOnListener;
-
-    public interface SystemNotificationPanelChangeListener {
-        void onNotificationPanelChanged(boolean open);
-    }
-
-    public interface SystemScreenOnListener {
-        void onScreenOn();
-
-        void onScreenOff();
-
-    }
-
-    public GlobalDeviceReceiver setSystemNotificationPanelChangeListener(SystemNotificationPanelChangeListener listener) {
-        this.systemNotificationPanelChangeListener = listener;
-        return this;
-    }
-
-    public GlobalDeviceReceiver setSystemScreenOnListener(SystemScreenOnListener listener) {
-        this.systemScreenOnListener = listener;
-        return this;
-    }
-
-    public void enable(Context context, boolean enable) {
+    fun enable(context: Context, enable: Boolean) {
         try {
             if (enable) {
-                BroadcastHelper.ensureRegisterReceiver(context, this, intentFilter());
+                BroadcastHelper.ensureRegisterReceiver(context, this, intentFilter())
             } else {
-                BroadcastHelper.ensureUnregisterReceiver(context, this);
+                BroadcastHelper.ensureUnregisterReceiver(context, this)
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    private IntentFilter intentFilter() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(SYSTEM_UI_DIALOG_OPEN_ACTION);
-        filter.addAction(SYSTEM_UI_DIALOG_CLOSE_ACTION);
-        filter.addAction(SYSTEM_SCREEN_ON_ACTION);
-        return filter;
+    private fun intentFilter(): IntentFilter = IntentFilter().apply {
+        addAction(DeviceReceiver.SYSTEM_UI_DIALOG_OPEN_ACTION)
+        addAction(DeviceReceiver.SYSTEM_UI_DIALOG_CLOSE_ACTION)
+        addAction(Intent.ACTION_SCREEN_ON)
     }
 
-    private void handleSystemUIDialogAction(Intent intent) {
-        String action = intent.getAction();
-        String dialogType = intent.getStringExtra(DIALOG_TYPE);
-        boolean open;
-        if (StringUtils.safelyEquals(dialogType, DIALOG_TYPE_NOTIFICATION_PANEL)) {
-            if (StringUtils.safelyEquals(action, SYSTEM_UI_DIALOG_OPEN_ACTION)) {
-                open = true;
-            } else if (StringUtils.safelyEquals(action, SYSTEM_UI_DIALOG_CLOSE_ACTION)) {
-                open = false;
-            } else {
-                open = false;
+    private fun handleSystemUIDialogAction(intent: Intent) {
+        val action = intent.action
+        val dialogType = intent.getStringExtra(DeviceReceiver.DIALOG_TYPE)
+        val open: Boolean
+        if (dialogType == DeviceReceiver.DIALOG_TYPE_NOTIFICATION_PANEL) {
+            open = when (action) {
+                DeviceReceiver.SYSTEM_UI_DIALOG_OPEN_ACTION -> true
+                DeviceReceiver.SYSTEM_UI_DIALOG_CLOSE_ACTION -> false
+                else -> false
             }
-            if (systemNotificationPanelChangeListener != null) {
-                systemNotificationPanelChangeListener.onNotificationPanelChanged(open);
-            }
+            callbacks?.onNotificationPanel(open)
         }
     }
 
-    private void handSystemScreenOnAction() {
-        if (systemScreenOnListener != null) {
-            systemScreenOnListener.onScreenOn();
+    private fun handSystemScreenOnAction() {
+        callbacks?.onScreenOn()
+    }
+
+    private fun handSystemScreenOffAction() {
+        callbacks?.onScreenOff()
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        val action = intent.action ?: return
+        when (action) {
+            DeviceReceiver.SYSTEM_UI_DIALOG_OPEN_ACTION, DeviceReceiver.SYSTEM_UI_DIALOG_CLOSE_ACTION ->
+                handleSystemUIDialogAction(intent)
+
+            Intent.ACTION_SCREEN_ON -> handSystemScreenOnAction()
+            Intent.ACTION_SCREEN_OFF -> handSystemScreenOffAction()
         }
     }
 
-    private void handSystemScreenOffAction() {
-        if (systemScreenOnListener != null) {
-            systemScreenOnListener.onScreenOff();
-        }
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        if (action == null) {
-            return;
-        }
-        if (StringUtils.safelyEquals(action, SYSTEM_UI_DIALOG_OPEN_ACTION)
-                || StringUtils.safelyEquals(action, SYSTEM_UI_DIALOG_CLOSE_ACTION)) {
-            handleSystemUIDialogAction(intent);
-        } else if (StringUtils.safelyEquals(action, SYSTEM_SCREEN_ON_ACTION)) {
-            handSystemScreenOnAction();
-
-        } else if (StringUtils.safelyEquals(action, SYSTEM_SCREEN_OFF_ACTION)) {
-            handSystemScreenOffAction();
-        }
+    interface Callbacks {
+        fun onNotificationPanel(open: Boolean)
+        fun onScreenOn()
+        fun onScreenOff()
     }
 }

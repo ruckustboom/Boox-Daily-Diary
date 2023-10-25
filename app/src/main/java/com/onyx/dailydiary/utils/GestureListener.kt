@@ -1,73 +1,69 @@
-package com.onyx.dailydiary.utils;
+package com.onyx.dailydiary.utils
 
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import android.util.Log
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.MotionEvent
+import kotlin.math.abs
 
-import androidx.annotation.NonNull;
-
-public class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
-    public static final int SWIPE_VELOCITY_THRESHOLD = 1000;
-    public static final int SWIPE_THRESHOLD = 400;
-    private static final String TAG = GestureListener.class.getSimpleName();
-
-    @Override
-    public boolean onDown(@NonNull MotionEvent event) {
-        return true;
+open class GestureListener : SimpleOnGestureListener() {
+    override fun onDown(event: MotionEvent): Boolean {
+        return true
     }
 
-    @Override
-    public boolean onFling(
-            MotionEvent event1,
-            MotionEvent event2,
-            float velocityX,
-            float velocityY
-    ) {
-        float diffY = event2.getY() - event1.getY();
-        float diffX = event2.getX() - event1.getX();
-        Log.d(TAG, "onFling: " + diffY + " " + diffX + " " + velocityX + " " + velocityY);
-
-        if (Math.abs(diffX) > Math.abs(diffY)) {
-            if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+    override fun onFling(
+        event1: MotionEvent?,
+        event2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
+        if (event1 == null) return false
+        val diffY = event2.y - event1.y
+        val diffX = event2.x - event1.x
+        Log.d(TAG, "onFling: $diffY $diffX $velocityX $velocityY")
+        if (abs(diffX) > abs(diffY)) {
+            if (abs(diffX) > SWIPE_THRESHOLD && abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                 if (diffX > 0) {
-                    onSwipeRight();
+                    onSwipeRight()
                 } else {
-                    onSwipeLeft();
+                    onSwipeLeft()
                 }
             }
         } else {
-            if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+            if (abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                 if (diffY > 0) {
-                    onSwipeBottom();
+                    onSwipeBottom()
                 } else {
-                    onSwipeTop();
+                    onSwipeTop()
                 }
             }
         }
-
-        return true;
+        return true
     }
 
-    public void onSwipeLeft() {
-        Log.d(TAG, "onSwipeLeft");
-
+    open fun onSwipeLeft() {
+        Log.d(TAG, "onSwipeLeft")
     }
 
-    public void onSwipeRight() {
-        Log.d(TAG, "onSwipeRight");
+    open fun onSwipeRight() {
+        Log.d(TAG, "onSwipeRight")
     }
 
-    public void onSwipeBottom() {
-        Log.d(TAG, "onSwipeBottom");
+    open fun onSwipeBottom() {
+        Log.d(TAG, "onSwipeBottom")
     }
 
-    public void onSwipeTop() {
-        Log.d(TAG, "onSwipeTop");
+    open fun onSwipeTop() {
+        Log.d(TAG, "onSwipeTop")
     }
 
-    public boolean onDoubleTap(MotionEvent event) {
-        Log.d(TAG, "onDoubleTap: " + event.toString());
-        return true;
+    override fun onDoubleTap(event: MotionEvent): Boolean {
+        Log.d(TAG, "onDoubleTap: $event")
+        return true
+    }
+
+    companion object {
+        private const val SWIPE_VELOCITY_THRESHOLD = 1000
+        private const val SWIPE_THRESHOLD = 400
+        private val TAG = GestureListener::class.java.simpleName
     }
 }

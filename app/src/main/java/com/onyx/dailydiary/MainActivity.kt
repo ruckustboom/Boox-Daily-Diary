@@ -1,346 +1,305 @@
-package com.onyx.dailydiary;
+package com.onyx.dailydiary
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.Rect
+import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.SurfaceHolder
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.onyx.android.sdk.pen.TouchHelper
+import com.onyx.dailydiary.calendar.CalendarAdapter
+import com.onyx.dailydiary.calendar.CalendarViewHolder
+import com.onyx.dailydiary.databinding.ActivityMainBinding
+import com.onyx.dailydiary.ical.CalendarActivity
+import com.onyx.dailydiary.ical.iCalParser
+import com.onyx.dailydiary.utils.BitmapView
+import com.onyx.dailydiary.utils.GlobalDeviceReceiver
+import com.onyx.dailydiary.utils.PenCallback
+import com.onyx.dailydiary.writer.WriterActivity
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.onyx.android.sdk.pen.TouchHelper;
-import com.onyx.dailydiary.calendar.CalendarAdapter;
-import com.onyx.dailydiary.calendar.CalendarViewHolder;
-import com.onyx.dailydiary.databinding.ActivityMainBinding;
-import com.onyx.dailydiary.ical.CalendarActivity;
-import com.onyx.dailydiary.ical.iCalParser;
-import com.onyx.dailydiary.utils.BitmapView;
-import com.onyx.dailydiary.utils.GlobalDeviceReceiver;
-import com.onyx.dailydiary.utils.PenCallback;
-import com.onyx.dailydiary.writer.WriterActivity;
-
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity implements CalendarAdapter.OnItemListener, View.OnClickListener {
-    private ActivityMainBinding binding;
-    private TextView monthText;
-    private RecyclerView calendarRecyclerView;
-    private LocalDate selectedDate;
-    public TouchHelper touchHelper;
-
-    private CalendarViewHolder lastHolder = null;
-
-    private final float STROKE_WIDTH = 4.0f;
-    private String DayofMonth;
-    private final List<Rect> limitRectList = new ArrayList<>();
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private iCalParser parser;
-    private final GlobalDeviceReceiver deviceReceiver = new GlobalDeviceReceiver();
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        deviceReceiver.enable(this, true);
-        View view = binding.getRoot();
-        setContentView(view);
-
-        selectedDate = LocalDate.now();
-        initWidgets();
-        initReceiver();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d");
-        DayofMonth = selectedDate.format(formatter);
-        List<BitmapView> viewList = new ArrayList<>();
-        viewList.add(binding.taskssurfaceview);
-        viewList.add(binding.summarysurfaceview);
-        PenCallback penCallback = new PenCallback(this, viewList);
-        touchHelper = TouchHelper.create(getWindow().getDecorView().getRootView(), penCallback);
-        touchHelper.debugLog(false);
-        touchHelper.setRawInputReaderEnable(true);
-        penCallback.setTouchHelper(touchHelper);
-
-        String summaryFilename = getCurrentDateString() + ".png";
-        String tasksFilename = "tasks.png";
-        initSurfaceView(binding.taskssurfaceview, tasksFilename, R.drawable.tasks_bkgrnd);
-        initSurfaceView(binding.summarysurfaceview, summaryFilename, R.drawable.summary_bkgrnd);
-
-        Button clear_all = (Button) view.findViewById(R.id.clearsummary);
-        clear_all.setOnClickListener(this);
-        Button open_diary = (Button) view.findViewById(R.id.opendiary);
-        open_diary.setOnClickListener(this);
-        Button clear_tasks = (Button) view.findViewById(R.id.clear_tasks);
-        clear_tasks.setOnClickListener(this);
-        parser = new iCalParser(getApplicationContext());
-        parser.loadCalendars();
-        setMonthView();
+class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.OnClickListener {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var monthText: TextView
+    private lateinit var calendarRecyclerView: RecyclerView
+    private lateinit var selectedDate: LocalDate
+    private lateinit var touchHelper: TouchHelper
+    private var lastHolder: CalendarViewHolder? = null
+    private var dayOfMonth: String? = null
+    private val limitRectList = mutableListOf<Rect>()
+    private lateinit var parser: iCalParser
+    private val deviceReceiver = GlobalDeviceReceiver()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        deviceReceiver.enable(this, true)
+        val view: View = binding.root
+        setContentView(view)
+        selectedDate = LocalDate.now()
+        initWidgets()
+        initReceiver()
+        val formatter = DateTimeFormatter.ofPattern("d")
+        dayOfMonth = selectedDate.format(formatter)
+        val viewList: MutableList<BitmapView> = ArrayList()
+        viewList.add(binding.taskssurfaceview)
+        viewList.add(binding.summarysurfaceview)
+        val penCallback = PenCallback(this, viewList)
+        touchHelper = TouchHelper.create(window.decorView.rootView, penCallback)
+        touchHelper.debugLog(false)
+        touchHelper.setRawInputReaderEnable(true)
+        penCallback.setTouchHelper(touchHelper)
+        val summaryFilename = "$currentDateString.png"
+        val tasksFilename = "tasks.png"
+        initSurfaceView(binding.taskssurfaceview, tasksFilename, R.drawable.tasks_bkgrnd)
+        initSurfaceView(binding.summarysurfaceview, summaryFilename, R.drawable.summary_bkgrnd)
+        view.findViewById<Button>(R.id.clearsummary).setOnClickListener(this)
+        view.findViewById<Button>(R.id.opendiary).setOnClickListener(this)
+        view.findViewById<Button>(R.id.clear_tasks).setOnClickListener(this)
+        parser = iCalParser(applicationContext)
+        parser.loadCalendars()
+        setMonthView()
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy");
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy")
     }
 
-    @Override
-    public void onPause() {
-        Log.d(TAG, "onPause");
-        super.onPause();
-        touchHelper.setRawDrawingEnabled(false);
-        touchHelper.setRawDrawingRenderEnabled(false);
-        touchHelper.closeRawDrawing();
-        binding.taskssurfaceview.redrawSurface();
-        binding.summarysurfaceview.redrawSurface();
-        binding.taskssurfaceview.saveBitmap();
-        binding.summarysurfaceview.saveBitmap();
+    public override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
+        touchHelper.setRawDrawingEnabled(false)
+        touchHelper.isRawDrawingRenderEnabled = false
+        touchHelper.closeRawDrawing()
+        binding.taskssurfaceview.redrawSurface()
+        binding.summarysurfaceview.redrawSurface()
+        binding.taskssurfaceview.saveBitmap()
+        binding.summarysurfaceview.saveBitmap()
     }
 
-    @Override
-    public void onResume() {
-        Log.d(TAG, "onResume");
-        super.onResume();
-        startTouchHelper();
+    public override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+        startTouchHelper()
     }
 
-
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == R.id.clear_tasks) {
-            binding.taskssurfaceview.resetBitmap();
-            binding.taskssurfaceview.redrawSurface();
-        } else if (id == R.id.clearsummary) {
-            binding.summarysurfaceview.resetBitmap();
-            binding.summarysurfaceview.redrawSurface();
-        } else if (id == R.id.opendiary) {
-            binding.taskssurfaceview.saveBitmap();
-            binding.summarysurfaceview.saveBitmap();
-            openPage();
+    override fun onClick(view: View) {
+        when (view.id) {
+            R.id.clear_tasks -> {
+                binding.taskssurfaceview.resetBitmap()
+                binding.taskssurfaceview.redrawSurface()
+            }
+            R.id.clearsummary -> {
+                binding.summarysurfaceview.resetBitmap()
+                binding.summarysurfaceview.redrawSurface()
+            }
+            R.id.opendiary -> {
+                binding.taskssurfaceview.saveBitmap()
+                binding.summarysurfaceview.saveBitmap()
+                openPage()
+            }
         }
-        Log.d(TAG, "onClick");
+        Log.d(TAG, "onClick")
     }
 
-    @Override
-    public void onItemClick(int position, String dayText, CalendarViewHolder holder) {
-        if (!dayText.equals("")) {
-            binding.summarysurfaceview.saveBitmap();
-
-            DayofMonth = dayText;
-            String summaryFilename = getCurrentDateString() + ".png";
-
-            binding.summarysurfaceview.setFilename(summaryFilename);
-            binding.summarysurfaceview.redrawSurface();
-
+    override fun onItemClick(position: Int, dayText: String?, holder: CalendarViewHolder?) {
+        if (dayText != "") {
+            binding.summarysurfaceview.saveBitmap()
+            dayOfMonth = dayText
+            val summaryFilename = "$currentDateString.png"
+            binding.summarysurfaceview.fileName = summaryFilename
+            binding.summarysurfaceview.redrawSurface()
             if (lastHolder != null) {
-                lastHolder.layout.setBackgroundColor(Color.WHITE);
-                lastHolder.headerlayout.setBackgroundColor(Color.WHITE);
-                lastHolder.eventsText.setTextColor(Color.BLACK);
-                lastHolder.dayOfMonth.setTextColor(Color.BLACK);
+                lastHolder!!.layout.setBackgroundColor(Color.WHITE)
+                lastHolder!!.headerLayout.setBackgroundColor(Color.WHITE)
+                lastHolder!!.eventsText.setTextColor(Color.BLACK)
+                lastHolder!!.dayOfMonth.setTextColor(Color.BLACK)
             }
-            holder.layout.setBackgroundColor(Color.DKGRAY);
-            holder.dayOfMonth.setTextColor(Color.WHITE);
-            holder.eventsText.setTextColor(Color.WHITE);
-            holder.headerlayout.setBackgroundColor(Color.DKGRAY);
-
-            lastHolder = holder;
+            holder!!.layout.setBackgroundColor(Color.DKGRAY)
+            holder.dayOfMonth.setTextColor(Color.WHITE)
+            holder.eventsText.setTextColor(Color.WHITE)
+            holder.headerLayout.setBackgroundColor(Color.DKGRAY)
+            lastHolder = holder
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main_menu, menu)
+        return true
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val itemId = item.itemId
         if (itemId == R.id.action_reload) {
-            parser.sync_calendars();
-            setMonthView();
-        } else if (itemId == R.id.edit_calendars) {// opening a new intent to open calendar settings activity.
-            Intent i = new Intent(MainActivity.this, CalendarActivity.class);
-            startActivity(i);
+            parser.syncCalendars()
+            setMonthView()
+        } else if (itemId == R.id.edit_calendars) { // opening a new intent to open calendar settings activity.
+            val i = Intent(this@MainActivity, CalendarActivity::class.java)
+            startActivity(i)
         }
-
-        return true;
+        return true
     }
 
-    private void initReceiver() {
-        deviceReceiver.setSystemNotificationPanelChangeListener(open -> {
-            touchHelper.setRawDrawingEnabled(!open);
-            Log.d(TAG, "onNotificationPanelChanged " + open);
-            binding.taskssurfaceview.saveBitmap();
-            binding.summarysurfaceview.saveBitmap();
-        }).setSystemScreenOnListener(new GlobalDeviceReceiver.SystemScreenOnListener() {
-            @Override
-            public void onScreenOn() {
-                Log.d(TAG, "onScreenOn");
-                selectedDate = LocalDate.now();
-                setMonthView();
+    private fun initReceiver() {
+        deviceReceiver.callbacks = object : GlobalDeviceReceiver.Callbacks {
+            override fun onNotificationPanel(open: Boolean) {
+                touchHelper.setRawDrawingEnabled(!open)
+                Log.d(TAG, "onNotificationPanelChanged $open")
+                binding.taskssurfaceview.saveBitmap()
+                binding.summarysurfaceview.saveBitmap()
             }
 
-            @Override
-            public void onScreenOff() {
-                Log.d(TAG, "onScreenOff");
-                onPause();
-            }
-        });
-    }
-
-    private void initSurfaceView(BitmapView surfaceView, String filename, int background) {
-        surfaceView.setBackground(background);
-        String filepath = "DailyNotes";
-        surfaceView.setFilepath(filepath);
-        surfaceView.setFilename(filename);
-        Log.d(TAG, "initSurfaceView");
-
-        final SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                Log.d(TAG, "Tasks surfaceCreated");
-
-                Rect limit = new Rect();
-                surfaceView.getGlobalVisibleRect(limit);
-                limitRectList.add(limit);
-                startTouchHelper();
-                surfaceView.redrawSurface();
-
+            override fun onScreenOn() {
+                Log.d(TAG, "onScreenOn")
+                selectedDate = LocalDate.now()
+                setMonthView()
             }
 
-            @Override
-            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-                Log.d(TAG, "Tasks surfaceChanged");
+            override fun onScreenOff() {
+                Log.d(TAG, "onScreenOff")
+                onPause()
             }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                holder.removeCallback(this);
-            }
-        };
-        surfaceView.getHolder().addCallback(surfaceCallback);
-    }
-
-
-    private void initWidgets() {
-        calendarRecyclerView = findViewById(R.id.calendarRecyclerView);
-        monthText = findViewById(R.id.monthTV);
-    }
-
-
-    private void startTouchHelper() {
-        if (limitRectList.size() < 2) {
-            return;
         }
-        touchHelper.setStrokeWidth(STROKE_WIDTH);
-        touchHelper.setStrokeStyle(TouchHelper.STROKE_STYLE_MARKER);
-        touchHelper.setStrokeColor(Color.BLACK);
-        touchHelper.setLimitRect(limitRectList, new ArrayList<>())
-                .openRawDrawing();
-
-        touchHelper.setRawDrawingEnabled(false);
-//        touchHelper.setMultiRegionMode();
-        touchHelper.setSingleRegionMode();
-        touchHelper.setRawDrawingEnabled(true);
-        touchHelper.enableFingerTouch(true);
-        touchHelper.setRawDrawingRenderEnabled(true);
     }
 
-    public void openPage() {
+    private fun initSurfaceView(surfaceView: BitmapView, filename: String, background: Int) {
+        surfaceView.background = background
+        val filepath = "DailyNotes"
+        surfaceView.setFilepath(filepath)
+        surfaceView.fileName = filename
+        Log.d(TAG, "initSurfaceView")
+        val surfaceCallback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                Log.d(TAG, "Tasks surfaceCreated")
+                val limit = Rect()
+                surfaceView.getGlobalVisibleRect(limit)
+                limitRectList.add(limit)
+                startTouchHelper()
+                surfaceView.redrawSurface()
+            }
+
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+                Log.d(TAG, "Tasks surfaceChanged")
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                holder.removeCallback(this)
+            }
+        }
+        surfaceView.holder.addCallback(surfaceCallback)
+    }
+
+    private fun initWidgets() {
+        calendarRecyclerView = findViewById(R.id.calendarRecyclerView)
+        monthText = findViewById(R.id.monthTV)
+    }
+
+    private fun startTouchHelper() {
+        if (limitRectList.size < 2) return
+        touchHelper.setStrokeWidth(STROKE_WIDTH)
+        touchHelper.setStrokeStyle(TouchHelper.STROKE_STYLE_MARKER)
+        touchHelper.setStrokeColor(Color.BLACK)
+        touchHelper.setLimitRect(limitRectList, ArrayList()).openRawDrawing()
+        touchHelper.setRawDrawingEnabled(false)
+        touchHelper.setSingleRegionMode()
+        touchHelper.setRawDrawingEnabled(true)
+        touchHelper.enableFingerTouch(true)
+        touchHelper.isRawDrawingRenderEnabled = true
+    }
+
+    private fun openPage() {
         try {
-            Intent intent = new Intent(MainActivity.this, WriterActivity.class);
-            intent.putExtra("date-string", getCurrentDateString()); //Optional parameters
-            intent.putExtra("stroke-width", STROKE_WIDTH);
-            startActivity(intent);
-
-        } catch (Exception e) {
-            Toast.makeText(MainActivity.this, "Unable to open daily notes.", Toast.LENGTH_LONG).show();
+            val intent = Intent(this@MainActivity, WriterActivity::class.java)
+            intent.putExtra("date-string", currentDateString) //Optional parameters
+            intent.putExtra("stroke-width", STROKE_WIDTH)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this@MainActivity, "Unable to open daily notes.", Toast.LENGTH_LONG)
+                .show()
         }
     }
 
-    public String getCurrentDateString() {
-        return DayofMonth + "-" + monthYearFromDate(selectedDate);
+    private val currentDateString: String
+        get() = dayOfMonth + "-" + monthYearFromDate(selectedDate)
+
+    private fun setMonthView() {
+        Log.d(TAG, "setMonthView")
+        monthText.text = monthFromDate(selectedDate)
+        val daysInMonth = daysInMonthArray(selectedDate)
+        val holderListener = HolderListener(::onTodayHolderCreated)
+        val calendarAdapter =
+            CalendarAdapter(parser, daysInMonth, selectedDate, this, holderListener)
+        val layoutManager = GridLayoutManager(applicationContext, 7)
+        calendarRecyclerView.adapter = null
+        calendarRecyclerView.layoutManager = null
+        calendarRecyclerView.layoutManager = layoutManager
+        calendarRecyclerView.adapter = calendarAdapter
+        calendarAdapter.notifyDataSetChanged()
     }
 
-    private void setMonthView() {
-        Log.d(TAG, "setMonthView");
-
-        monthText.setText(monthFromDate(selectedDate));
-        ArrayList<String> daysInMonth = daysInMonthArray(selectedDate);
-        HolderListener HolderListener = this::onTodayHolderCreated;
-        CalendarAdapter calendarAdapter = new CalendarAdapter(parser, daysInMonth, selectedDate, this, HolderListener);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 7);
-
-
-        calendarRecyclerView.setAdapter(null);
-        calendarRecyclerView.setLayoutManager(null);
-
-        calendarRecyclerView.setLayoutManager(layoutManager);
-        calendarRecyclerView.setAdapter(calendarAdapter);
-
-        calendarAdapter.notifyDataSetChanged();
+    fun interface HolderListener {
+        fun onTodayHolderCreated(holder: CalendarViewHolder?)
     }
 
-    public interface HolderListener {
-        void onTodayHolderCreated(CalendarViewHolder holder);
+    private fun onTodayHolderCreated(holder: CalendarViewHolder?) {
+        lastHolder = holder
     }
 
-    void onTodayHolderCreated(CalendarViewHolder holder) {
-        lastHolder = holder;
-    }
-
-    private ArrayList<String> daysInMonthArray(LocalDate date) {
-        ArrayList<String> daysInMonthArray = new ArrayList<>();
-        YearMonth yearMonth = YearMonth.from(date);
-
-        int daysInMonth = yearMonth.lengthOfMonth();
-
-        LocalDate firstOfMonth = selectedDate.withDayOfMonth(1);
-        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
-
-        for (int i = 1; i <= 42; i++) {
+    private fun daysInMonthArray(date: LocalDate?): ArrayList<String> {
+        val daysInMonthArray = ArrayList<String>()
+        val yearMonth = YearMonth.from(date)
+        val daysInMonth = yearMonth.lengthOfMonth()
+        val firstOfMonth = selectedDate.withDayOfMonth(1)
+        val dayOfWeek = firstOfMonth.dayOfWeek.value
+        for (i in 1..42) {
             if (i < dayOfWeek || i >= daysInMonth + dayOfWeek) {
-                daysInMonthArray.add("");
+                daysInMonthArray.add("")
             } else {
-                daysInMonthArray.add(String.valueOf(i - dayOfWeek + 1));
+                daysInMonthArray.add((i - dayOfWeek + 1).toString())
             }
         }
-        return daysInMonthArray;
+        return daysInMonthArray
     }
 
-    private String monthYearFromDate(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM-yyyy");
-        return date.format(formatter);
+    private fun monthYearFromDate(date: LocalDate?): String {
+        val formatter = DateTimeFormatter.ofPattern("MMMM-yyyy")
+        return date!!.format(formatter)
     }
 
-    private String monthFromDate(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
-        return date.format(formatter);
+    private fun monthFromDate(date: LocalDate?): String {
+        val formatter = DateTimeFormatter.ofPattern("MMMM")
+        return date!!.format(formatter)
     }
 
-    public void previousMonthAction(View view) {
-        selectedDate = selectedDate.minusMonths(1);
-        setMonthView();
+    fun previousMonthAction(view: View?) {
+        selectedDate = selectedDate.minusMonths(1)
+        setMonthView()
     }
 
-    public void nextMonthAction(View view) {
-        selectedDate = selectedDate.plusMonths(1);
-        setMonthView();
+    fun nextMonthAction(view: View?) {
+        selectedDate = selectedDate.plusMonths(1)
+        setMonthView()
+    }
+
+    companion object {
+        private val TAG = MainActivity::class.java.simpleName
+        private const val STROKE_WIDTH = 4.0f
     }
 }

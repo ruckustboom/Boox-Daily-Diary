@@ -187,7 +187,7 @@ class PenCallback(
             view.getGlobalVisibleRect(limit, offset)
             viewRect.offset(-offset.x.toFloat(), -offset.y.toFloat())
             rxManager.enqueue(
-                PartialRefreshRequest(context, view, viewRect).setBitmap(view.bitmap),
+                PartialRefreshRequest(context, view, viewRect, view.bitmap),
                 object : RxCallback<PartialRefreshRequest>() {
                     override fun onNext(partialRefreshRequest: PartialRefreshRequest) {}
                 },
