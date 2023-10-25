@@ -7,11 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.onyx.dailydiary.MainActivity.HolderListener
 import com.onyx.dailydiary.R
-import com.onyx.dailydiary.ical.iCalParser
 import java.time.LocalDate
 
 class CalendarAdapter(
-    private val parser: iCalParser,
     private val daysOfMonth: ArrayList<String>,
     private val selectedDate: LocalDate,
     private val onItemListener: OnItemListener,
@@ -31,11 +29,6 @@ class CalendarAdapter(
         if (daysOfMonth[position] == "") {
             holder.layout.setBackgroundColor(Color.LTGRAY)
             holder.headerLayout.setBackgroundColor(Color.LTGRAY)
-            holder.eventsText.text = ""
-        } else {
-            val holderDate = selectedDate.withDayOfMonth(daysOfMonth[position].toInt())
-            holder.eventsText.text = parser.getDayEvents(holderDate)
-                .joinToString("\n")
         }
         holder.dayOfMonth.text = daysOfMonth[position]
         holder.currentDay.setImageResource(R.drawable.white_circle)

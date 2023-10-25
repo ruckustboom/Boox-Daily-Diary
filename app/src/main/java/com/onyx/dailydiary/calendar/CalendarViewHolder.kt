@@ -12,7 +12,6 @@ class CalendarViewHolder(
     private val onItemListener: CalendarAdapter.OnItemListener,
 ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
     val dayOfMonth: TextView = itemView.findViewById(R.id.cellDayText)
-    val eventsText: TextView = itemView.findViewById(R.id.eventsText)
     val currentDay: ImageView = itemView.findViewById(R.id.selectedDay)
     val layout: LinearLayout = itemView.findViewById(R.id.cellDayLayout)
     val headerLayout: LinearLayout = itemView.findViewById(R.id.headerLayout)

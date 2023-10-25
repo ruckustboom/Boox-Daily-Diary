@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_reload"
-        android:title="@string/sync_calendars" />
-
-    <item android:id="@+id/edit_calendars"
-        android:title="@string/edit_calendars"
-        app:showAsAction="never"/>
-
 </menu>

@@ -17,9 +17,6 @@
         android:theme="@style/Theme.DailyDiary"
         tools:targetApi="31">
         <activity
-            android:name=".ical.CalendarActivity"
-            android:exported="false" />
-        <activity
             android:name=".writer.WriterActivity"
             android:exported="false" />
         <activity

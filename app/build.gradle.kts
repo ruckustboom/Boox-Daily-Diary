@@ -59,11 +59,10 @@ android {
 }
 
 dependencies {
-    implementation("org.mnode.ical4j:ical4j:3.0.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.preference:preference:1.2.1")
+    implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.onyx.android.sdk:onyxsdk-device:1.2.26") {
         exclude(group = "com.android.support", module = "support-compat")
     }

@@ -1,98 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<RelativeLayout
-    android:id="@+id/activity_writer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".writer.WriterActivity">
-
-    <LinearLayout
-        android:id="@+id/layout_function"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/black"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:layout_gravity="center_vertical|left"
-            app:srcCompat="@drawable/back" />
-
-        <TextView
-            android:id="@+id/date_text"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="30dp"
-            android:background="@color/black"
-            android:layout_gravity="center_vertical|center"
-            android:paddingLeft="10dp"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            android:text="Today" />
-
-
-        <ImageButton
-            android:id="@+id/save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:layout_gravity="center_vertical|end"
-            app:srcCompat="@drawable/savepages" />
-
-
-
-
-        <ImageButton
-            android:id="@+id/deletepage"
-            android:background="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            app:srcCompat="@drawable/deletepage" />
-
-        <ImageButton
-            android:id="@+id/addpage"
-            android:background="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            app:srcCompat="@drawable/addpage" />
-
-
-
-        <ImageButton
-            android:id="@+id/prevpage"
-            android:layout_width="wrap_content"
-            android:background="@color/black"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            app:srcCompat="@drawable/prevpage" />
-
-        <ImageButton
-            android:id="@+id/nextpage"
-            android:layout_width="wrap_content"
-            android:background="@color/black"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            app:srcCompat="@drawable/nextpage" />
-
-
-
-    </LinearLayout>
-
-    <com.onyx.dailydiary.utils.BitmapView
-        android:id="@+id/writerview"
+    <RelativeLayout
+        android:id="@+id/activity_writer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/layout_function" />
+        tools:context=".writer.WriterActivity">
 
-</RelativeLayout>
+        <LinearLayout
+            android:id="@+id/layout_function"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/black"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|left"
+                android:background="@color/black"
+                app:srcCompat="@drawable/back" />
+
+            <TextView
+                android:id="@+id/date_text"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical|center"
+                android:layout_weight="1"
+                android:background="@color/black"
+                android:paddingLeft="10dp"
+                android:text="Today"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+
+            <ImageButton
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                app:srcCompat="@drawable/savepages" />
+
+            <ImageButton
+                android:id="@+id/deletepage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                app:srcCompat="@drawable/deletepage" />
+
+            <ImageButton
+                android:id="@+id/addpage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                app:srcCompat="@drawable/addpage" />
+
+            <ImageButton
+                android:id="@+id/prevpage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                app:srcCompat="@drawable/prevpage" />
+
+            <ImageButton
+                android:id="@+id/nextpage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                app:srcCompat="@drawable/nextpage" />
+        </LinearLayout>
+
+        <com.onyx.dailydiary.utils.BitmapView
+            android:id="@+id/writerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/layout_function" />
+    </RelativeLayout>
 </layout>

@@ -5,77 +5,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.DailyDiary.AppBarOverlay">
+        android:theme="@style/Theme.DailyDiary.AppBarOverlay" />
 
-
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <LinearLayout
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@color/white"
                 android:layout_weight="1"
+                android:background="@color/white"
+                android:orientation="vertical"
                 android:theme="@style/Theme.DailyDiary.AppBarOverlay"
                 tools:context=".MainActivity">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
                     android:background="@color/white"
-                    android:layout_marginTop="20dp">
+                    android:orientation="horizontal">
 
                     <ImageButton
                         android:id="@+id/imageButtonLeft"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:background="@null"
                         android:layout_gravity="center_vertical|left"
+                        android:layout_weight="1"
+                        android:background="@null"
                         android:onClick="previousMonthAction"
                         app:srcCompat="@drawable/chevron_left" />
-
-
 
                     <TextView
                         android:id="@+id/monthTV"
                         android:layout_width="0dp"
-                        android:layout_weight="2"
                         android:layout_height="wrap_content"
+                        android:layout_weight="2"
                         android:text="January"
-                        android:textSize="20sp"
                         android:textAlignment="center"
-                        android:textColor="@color/black"/>
-
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
 
                     <ImageButton
                         android:id="@+id/imageButtonRight"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:background="@null"
                         android:layout_gravity="center_vertical|right"
+                        android:layout_weight="1"
+                        android:background="@null"
                         android:onClick="nextMonthAction"
                         app:srcCompat="@drawable/chevron_right" />
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -88,103 +79,92 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Monday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Tuesday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Wednesday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Thursday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Friday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Saturday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Sunday"
-                        android:textColor="@color/black"
                         android:textAlignment="center"
-                        android:textSize="16sp"/>
-
-
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
                 </LinearLayout>
-
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/calendarRecyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
-
-
-
-
             <LinearLayout
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@color/white"
                 android:layout_weight="1.5"
+                android:background="@color/white"
+                android:orientation="vertical"
                 android:theme="@style/Theme.DailyDiary.AppBarOverlay"
                 tools:context=".MainActivity">
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="vertical"
                         android:layout_weight="1"
-                        android:background="@color/black">
-
-
+                        android:background="@color/black"
+                        android:orientation="vertical">
 
                         <RelativeLayout
                             android:id="@+id/fragment_container_view"
@@ -201,28 +181,16 @@
                                 android:layout_height="50dp"
                                 android:orientation="horizontal">
 
-
                                 <TextView
-                                    style="@android:style/TextAppearance.DeviceDefault.Medium"
                                     android:id="@+id/task_text"
+                                    style="@android:style/TextAppearance.DeviceDefault.Medium"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="30dp"
                                     android:layout_gravity="center_vertical|left"
+                                    android:layout_weight="1"
                                     android:paddingLeft="10dp"
-                                    android:textColor="@color/white"
-                                    android:text="@string/tasks" />
-
-
-                                <!--            <ImageButton-->
-                                <!--                android:id="@+id/clear_tasks"-->
-                                <!--                android:layout_width="wrap_content"-->
-                                <!--                android:layout_height="wrap_content"-->
-                                <!--                android:layout_weight="1"-->
-
-                                <!--                android:background="@null"-->
-                                <!--                android:layout_gravity="center_vertical|start"-->
-                                <!--                app:srcCompat="@drawable/delete_all" />-->
+                                    android:text="@string/tasks"
+                                    android:textColor="@color/white" />
 
                                 <Button
                                     android:id="@+id/clear_tasks"
@@ -231,8 +199,6 @@
                                     android:layout_weight="0.05"
                                     android:stateListAnimator="@null"
                                     android:text="@string/clear_all" />
-
-
                             </LinearLayout>
 
                             <com.onyx.dailydiary.utils.BitmapView
@@ -241,19 +207,15 @@
                                 android:layout_height="match_parent"
                                 android:layout_below="@id/layout_function"
                                 android:visibility="visible" />
-
                         </RelativeLayout>
-
-
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@color/black" >
-
+                        android:background="@color/black"
+                        android:orientation="horizontal">
 
                         <RelativeLayout
                             android:id="@+id/fragment_container_view_summary"
@@ -270,18 +232,16 @@
                                 android:layout_height="50dp"
                                 android:orientation="horizontal">
 
-
                                 <TextView
-                                    style="@android:style/TextAppearance.DeviceDefault.Medium"
                                     android:id="@+id/summary_text"
+                                    style="@android:style/TextAppearance.DeviceDefault.Medium"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="30dp"
                                     android:layout_gravity="center_vertical|left"
+                                    android:layout_weight="1"
                                     android:paddingLeft="10dp"
-                                    android:textColor="@color/white"
-                                    android:text="@string/daily_summary" />
-
+                                    android:text="@string/daily_summary"
+                                    android:textColor="@color/white" />
 
                                 <Button
                                     android:id="@+id/opendiary"
@@ -291,7 +251,6 @@
                                     android:stateListAnimator="@null"
                                     android:text="@string/open_diary" />
 
-
                                 <Button
                                     android:id="@+id/clearsummary"
                                     android:layout_width="wrap_content"
@@ -299,8 +258,6 @@
                                     android:layout_weight="0.1"
                                     android:stateListAnimator="@null"
                                     android:text="@string/clear_summary" />
-
-
                             </LinearLayout>
 
                             <com.onyx.dailydiary.utils.BitmapView
@@ -309,89 +266,11 @@
                                 android:layout_height="match_parent"
                                 android:layout_below="@id/layout_function2"
                                 android:visibility="visible" />
-
-
                         </RelativeLayout>
-
-
                     </LinearLayout>
-
                 </LinearLayout>
-
-
-
-
             </LinearLayout>
-
-            <!--        <LinearLayout-->
-            <!--            xmlns:tools="http://schemas.android.com/tools"-->
-            <!--            android:layout_width="match_parent"-->
-            <!--            android:layout_height="match_parent"-->
-            <!--            android:orientation="vertical"-->
-            <!--            android:background="@color/white"-->
-            <!--            android:layout_weight="1.5"-->
-            <!--            android:theme="@style/Theme.DailyDiary.AppBarOverlay"-->
-            <!--            tools:context=".MainActivity">-->
-
-
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:orientation="horizontal">-->
-
-            <!--                <TextView-->
-            <!--                    android:layout_width="0dp"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_weight="1"-->
-            <!--                    android:text="@string/Monday"-->
-            <!--                    android:textColor="@color/gray"-->
-            <!--                    android:textAlignment="center"-->
-            <!--                    android:textSize="16sp"/>-->
-
-            <!--                <TextView-->
-            <!--                    android:layout_width="0dp"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_weight="1"-->
-            <!--                    android:text="@string/Tuesday"-->
-            <!--                    android:textColor="@color/gray"-->
-            <!--                    android:textAlignment="center"-->
-            <!--                    android:textSize="16sp"/>-->
-
-            <!--            </LinearLayout>-->
-
-
-
-
-            <!--        </LinearLayout>-->
-
         </LinearLayout>
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--        android:id="@+id/fab"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="bottom|end"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginBottom="16dp"-->
-<!--        app:backgroundTint="@color/lightgray"-->
-<!--        app:srcCompat="@drawable/notes" />-->
-
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

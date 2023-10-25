@@ -19,8 +19,6 @@ import com.onyx.android.sdk.pen.TouchHelper
 import com.onyx.dailydiary.calendar.CalendarAdapter
 import com.onyx.dailydiary.calendar.CalendarViewHolder
 import com.onyx.dailydiary.databinding.ActivityMainBinding
-import com.onyx.dailydiary.ical.CalendarActivity
-import com.onyx.dailydiary.ical.iCalParser
 import com.onyx.dailydiary.utils.BitmapView
 import com.onyx.dailydiary.utils.GlobalDeviceReceiver
 import com.onyx.dailydiary.utils.PenCallback
@@ -38,7 +36,6 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
     private var lastHolder: CalendarViewHolder? = null
     private var dayOfMonth: String? = null
     private val limitRectList = mutableListOf<Rect>()
-    private lateinit var parser: iCalParser
     private val deviceReceiver = GlobalDeviceReceiver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +63,6 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
         view.findViewById<Button>(R.id.clearsummary).setOnClickListener(this)
         view.findViewById<Button>(R.id.opendiary).setOnClickListener(this)
         view.findViewById<Button>(R.id.clear_tasks).setOnClickListener(this)
-        parser = iCalParser(applicationContext)
-        parser.loadCalendars()
         setMonthView()
     }
 
@@ -120,16 +115,16 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
             val summaryFilename = "$currentDateString.png"
             binding.summarysurfaceview.fileName = summaryFilename
             binding.summarysurfaceview.redrawSurface()
-            if (lastHolder != null) {
-                lastHolder!!.layout.setBackgroundColor(Color.WHITE)
-                lastHolder!!.headerLayout.setBackgroundColor(Color.WHITE)
-                lastHolder!!.eventsText.setTextColor(Color.BLACK)
-                lastHolder!!.dayOfMonth.setTextColor(Color.BLACK)
+            lastHolder?.run {
+                layout.setBackgroundColor(Color.WHITE)
+                headerLayout.setBackgroundColor(Color.WHITE)
+                dayOfMonth.setTextColor(Color.BLACK)
             }
-            holder!!.layout.setBackgroundColor(Color.DKGRAY)
-            holder.dayOfMonth.setTextColor(Color.WHITE)
-            holder.eventsText.setTextColor(Color.WHITE)
-            holder.headerLayout.setBackgroundColor(Color.DKGRAY)
+            holder?.run {
+                layout.setBackgroundColor(Color.DKGRAY)
+                dayOfMonth.setTextColor(Color.WHITE)
+                headerLayout.setBackgroundColor(Color.DKGRAY)
+            }
             lastHolder = holder
         }
     }
@@ -137,18 +132,6 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val itemId = item.itemId
-        if (itemId == R.id.action_reload) {
-            parser.syncCalendars()
-            setMonthView()
-        } else if (itemId == R.id.edit_calendars) { // opening a new intent to open calendar settings activity.
-            val i = Intent(this@MainActivity, CalendarActivity::class.java)
-            startActivity(i)
-        }
         return true
     }
 
@@ -245,7 +228,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
         val daysInMonth = daysInMonthArray(selectedDate)
         val holderListener = HolderListener(::onTodayHolderCreated)
         val calendarAdapter =
-            CalendarAdapter(parser, daysInMonth, selectedDate, this, holderListener)
+            CalendarAdapter(daysInMonth, selectedDate, this, holderListener)
         val layoutManager = GridLayoutManager(applicationContext, 7)
         calendarRecyclerView.adapter = null
         calendarRecyclerView.layoutManager = null
