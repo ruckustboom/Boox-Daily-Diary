@@ -14,7 +14,7 @@ open class GestureListener : SimpleOnGestureListener() {
         event1: MotionEvent?,
         event2: MotionEvent,
         velocityX: Float,
-        velocityY: Float
+        velocityY: Float,
     ): Boolean {
         if (event1 == null) return false
         val diffY = event2.y - event1.y
@@ -31,9 +31,9 @@ open class GestureListener : SimpleOnGestureListener() {
         } else {
             if (abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                 if (diffY > 0) {
-                    onSwipeBottom()
+                    onSwipeDown()
                 } else {
-                    onSwipeTop()
+                    onSwipeUp()
                 }
             }
         }
@@ -48,12 +48,12 @@ open class GestureListener : SimpleOnGestureListener() {
         Log.d(TAG, "onSwipeRight")
     }
 
-    open fun onSwipeBottom() {
-        Log.d(TAG, "onSwipeBottom")
+    open fun onSwipeDown() {
+        Log.d(TAG, "onSwipeDown")
     }
 
-    open fun onSwipeTop() {
-        Log.d(TAG, "onSwipeTop")
+    open fun onSwipeUp() {
+        Log.d(TAG, "onSwipeUp")
     }
 
     override fun onDoubleTap(event: MotionEvent): Boolean {

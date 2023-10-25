@@ -37,7 +37,7 @@ import java.time.temporal.TemporalAdjusters
 
 class WriterActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityWriterBinding
-    private lateinit var mDetector: GestureDetectorCompat
+    private lateinit var gestureDetector: GestureDetectorCompat
     private lateinit var touchHelper: TouchHelper
     private val filepath = "DailyDiary"
     private var filename: String? = null
@@ -47,9 +47,10 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
     private var dayPageCount = 0
     private lateinit var datebox: TextView
     private lateinit var currentDate: LocalDate
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportActionBar!!.hide()
+        supportActionBar?.hide()
         binding = ActivityWriterBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -63,8 +64,8 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         penCallback.setTouchHelper(touchHelper)
 
         // setup the gestures
-        mDetector = GestureDetectorCompat(this, object : GestureListener() {
-            override fun onSwipeBottom() {
+        gestureDetector = GestureDetectorCompat(this, object : GestureListener() {
+            override fun onSwipeDown() {
                 if (!penCallback.isRawDrawing) {
                     deletePage()
                 }
@@ -82,13 +83,12 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
 
-            override fun onSwipeTop() {
+            override fun onSwipeUp() {
                 if (!penCallback.isRawDrawing) {
                     addPage()
                 }
             }
         })
-
 
         // setup the date
         currentDate = LocalDate.parse(
@@ -131,9 +131,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        return if (mDetector.onTouchEvent(event)) {
-            true
-        } else super.onTouchEvent(event)
+        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
     override fun onPause() {
