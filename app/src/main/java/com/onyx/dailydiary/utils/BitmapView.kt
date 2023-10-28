@@ -13,7 +13,6 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
 import android.view.SurfaceView
-import androidx.core.content.res.ResourcesCompat
 import com.onyx.android.sdk.data.note.TouchPoint
 
 class BitmapView : SurfaceView {
@@ -22,7 +21,6 @@ class BitmapView : SurfaceView {
 
     private val mStrokeWidth = 4
 
-    var background = 0
     private val penPaint = Paint().apply {
         isAntiAlias = true
         isDither = true
@@ -41,6 +39,7 @@ class BitmapView : SurfaceView {
         strokeCap = Paint.Cap.SQUARE
         strokeWidth = (10 * mStrokeWidth).toFloat()
     }
+    var isErasing = false
 
     constructor(context: Context) : super(context)
 
@@ -88,12 +87,9 @@ class BitmapView : SurfaceView {
             if (!holder.surface.isValid) {
                 return
             }
-            val drawable = ResourcesCompat.getDrawable(resources, background, null)
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            drawable!!.setBounds(0, 0, width, height)
             val canvas = Canvas(bitmap!!)
             canvas.drawColor(Color.WHITE)
-            drawable.draw(canvas)
         } catch (e: Exception) {
             Log.d("resetBitmap Error: ", e.message, e)
         }
@@ -123,15 +119,15 @@ class BitmapView : SurfaceView {
         }
     }
 
-    fun drawToBitmap(list: List<TouchPoint>) {
+    fun drawStroke(points: List<TouchPoint>, isAlt: Boolean = false) {
         val canvas = Canvas(bitmap!!)
         val limit = Rect()
         val offset = Point()
         getGlobalVisibleRect(limit, offset)
         val path = Path()
-        val prePoint = PointF(list[0].x, list[0].y)
+        val prePoint = PointF(points[0].x, points[0].y)
         path.moveTo(prePoint.x - offset.x, prePoint.y - offset.y)
-        for (point in list) {
+        for (point in points) {
             path.quadTo(
                 prePoint.x - offset.x,
                 prePoint.y - offset.y,
@@ -141,31 +137,7 @@ class BitmapView : SurfaceView {
             prePoint.x = point.x
             prePoint.y = point.y
         }
-        canvas.drawPath(path, penPaint)
-    }
-
-    fun eraseBitmap(list: List<TouchPoint>) {
-        val canvas = Canvas(bitmap!!)
-        val limit = Rect()
-        val offset = Point()
-        getGlobalVisibleRect(limit, offset)
-        val path = Path()
-        val prePoint = PointF(list[0].x, list[0].y)
-        path.moveTo(prePoint.x - offset.x, prePoint.y - offset.y)
-        for (point in list) {
-            path.quadTo(
-                prePoint.x - offset.x,
-                prePoint.y - offset.y,
-                point.x - offset.x,
-                point.y - offset.y
-            )
-            prePoint.x = point.x
-            prePoint.y = point.y
-        }
-        canvas.drawPath(path, eraserPaint)
-        val drawable = ResourcesCompat.getDrawable(resources, background, null)
-        drawable!!.setBounds(0, 0, width, height)
-        drawable.draw(canvas)
+        canvas.drawPath(path, if (isErasing xor isAlt) eraserPaint else penPaint)
     }
 
     companion object {

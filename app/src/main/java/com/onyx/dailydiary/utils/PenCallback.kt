@@ -78,7 +78,7 @@ class PenCallback(
     }
 
     override fun onRawDrawingTouchPointListReceived(p0: TouchPointList) {
-        view.drawToBitmap(p0.points)
+        view.drawStroke(p0.points)
     }
 
     override fun onBeginRawErasing(p0: Boolean, p1: TouchPoint) {
@@ -105,7 +105,7 @@ class PenCallback(
         for (point in pointList) {
             touchPointList.add(point)
         }
-        view.eraseBitmap(pointList)
+        view.drawStroke(pointList, isAlt = true)
         val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
         val limit = Rect()
         val offset = Point()
@@ -129,7 +129,7 @@ class PenCallback(
             for (point in pointList) {
                 touchPointList.add(point)
             }
-            view.eraseBitmap(pointList)
+            view.drawStroke(pointList, isAlt = true)
             val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
             val limit = Rect()
             val offset = Point()
@@ -142,7 +142,7 @@ class PenCallback(
     override fun onRawErasingTouchPointListReceived(p0: TouchPointList) {
         Log.d(TAG, "onRawErasingTouchPointListReceived")
 
-        view.eraseBitmap(p0.points)
+        view.drawStroke(p0.points, isAlt = true)
         val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
         val limit = Rect()
         val offset = Point()

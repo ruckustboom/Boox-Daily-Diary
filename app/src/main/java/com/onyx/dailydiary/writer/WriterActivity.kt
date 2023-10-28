@@ -55,7 +55,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             override fun onSwipeUp() {
-                Log.d(TAG, "Swipe Up")
+                binding.writerview.isErasing = !binding.writerview.isErasing
             }
         })
 
@@ -63,12 +63,16 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         initSurfaceView()
 
         // setup the buttons
-        findViewById<ImageButton>(R.id.deletepage).setOnClickListener(this)
+        findViewById<ImageButton>(R.id.toolPen).setOnClickListener(this)
+        findViewById<ImageButton>(R.id.toolEraser).setOnClickListener(this)
+        findViewById<ImageButton>(R.id.deletePage).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.deletepage -> deletePage()
+            R.id.toolPen -> binding.writerview.isErasing = false
+            R.id.toolEraser -> binding.writerview.isErasing = true
+            R.id.deletePage -> deletePage()
         }
     }
 
@@ -96,7 +100,6 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initSurfaceView() {
-        binding.writerview.background = R.drawable.page_bkgrnd
         val surfaceCallback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 val limit = Rect()
@@ -111,7 +114,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
                 holder: SurfaceHolder,
                 format: Int,
                 width: Int,
-                height: Int
+                height: Int,
             ) {
             }
 
