@@ -17,6 +17,10 @@ open class GestureListener : SimpleOnGestureListener() {
         velocityY: Float,
     ): Boolean {
         if (event1 == null) return false
+        val props = MotionEvent.PointerProperties()
+        event2.getPointerProperties(0, props)
+        // Only handle finger events, not pen events
+        if (props.toolType != MotionEvent.TOOL_TYPE_FINGER) return false
         val diffY = event2.y - event1.y
         val diffX = event2.x - event1.x
         Log.d(TAG, "onFling: $diffY $diffX $velocityX $velocityY")

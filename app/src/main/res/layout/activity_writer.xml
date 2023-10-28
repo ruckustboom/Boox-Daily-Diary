@@ -29,24 +29,6 @@
                 android:textSize="22sp" />
 
             <ImageButton
-                android:id="@+id/toolPen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:background="@color/black"
-                app:srcCompat="@drawable/prevpage"
-                android:contentDescription="@string/delete" />
-
-            <ImageButton
-                android:id="@+id/toolEraser"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:background="@color/black"
-                app:srcCompat="@drawable/nextpage"
-                android:contentDescription="@string/delete" />
-
-            <ImageButton
                 android:id="@+id/deletePage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

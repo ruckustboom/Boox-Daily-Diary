@@ -41,9 +41,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         // setup the gestures
         gestureDetector = GestureDetectorCompat(this, object : GestureListener() {
             override fun onSwipeDown() {
-                if (!penCallback.isRawDrawing) {
-                    deletePage()
-                }
+                deletePage()
             }
 
             override fun onSwipeLeft() {
@@ -55,7 +53,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             override fun onSwipeUp() {
-                binding.writerview.isErasing = !binding.writerview.isErasing
+                Log.d(TAG, "Swipe Up")
             }
         })
 
@@ -63,15 +61,11 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         initSurfaceView()
 
         // setup the buttons
-        findViewById<ImageButton>(R.id.toolPen).setOnClickListener(this)
-        findViewById<ImageButton>(R.id.toolEraser).setOnClickListener(this)
         findViewById<ImageButton>(R.id.deletePage).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.toolPen -> binding.writerview.isErasing = false
-            R.id.toolEraser -> binding.writerview.isErasing = true
             R.id.deletePage -> deletePage()
         }
     }
@@ -133,7 +127,6 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         touchHelper.setStrokeColor(Color.BLACK)
         touchHelper.setLimitRect(limitRectList, ArrayList()).openRawDrawing()
         touchHelper.setRawDrawingEnabled(false)
-        touchHelper.setMultiRegionMode()
         touchHelper.setRawDrawingEnabled(true)
         touchHelper.enableFingerTouch(true)
         touchHelper.isRawDrawingRenderEnabled = true

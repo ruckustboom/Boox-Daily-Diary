@@ -16,6 +16,11 @@ import android.view.SurfaceView
 import com.onyx.android.sdk.data.note.TouchPoint
 
 class BitmapView : SurfaceView {
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
+            : super(context, attrs, defStyleAttr)
+
     var bitmap: Bitmap? = null
         private set
 
@@ -30,23 +35,6 @@ class BitmapView : SurfaceView {
         strokeCap = Paint.Cap.ROUND
         strokeWidth = mStrokeWidth.toFloat()
     }
-    private val eraserPaint = Paint().apply {
-        isAntiAlias = true
-        isDither = true
-        color = Color.WHITE
-        style = Paint.Style.FILL_AND_STROKE
-        strokeJoin = Paint.Join.ROUND
-        strokeCap = Paint.Cap.SQUARE
-        strokeWidth = (10 * mStrokeWidth).toFloat()
-    }
-    var isErasing = false
-
-    constructor(context: Context) : super(context)
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
-            : super(context, attrs, defStyleAttr)
 
     init {
         Log.d(TAG, "initView")
@@ -62,9 +50,8 @@ class BitmapView : SurfaceView {
     }
 
     public override fun onDraw(canvas: Canvas) {
-        Log.d(TAG, "onDraw")
-
         super.onDraw(canvas)
+        Log.d(TAG, "onDraw")
         if (bitmap == null) resetBitmap()
         canvas.drawColor(Color.WHITE)
         canvas.drawBitmap(bitmap!!, 0f, 0f, null)
@@ -103,23 +90,7 @@ class BitmapView : SurfaceView {
         holder.unlockCanvasAndPost(lockCanvas)
     }
 
-    fun partialRedraw(renderRect: Rect?) {
-        if (!holder.surface.isValid) {
-            return
-        }
-        val canvas = holder.lockCanvas(renderRect) ?: return
-        try {
-            canvas.clipRect(renderRect!!)
-            val rect = Rect(0, 0, bitmap!!.width, bitmap!!.height)
-            canvas.drawBitmap(bitmap!!, rect, rect, null)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            holder.unlockCanvasAndPost(canvas)
-        }
-    }
-
-    fun drawStroke(points: List<TouchPoint>, isAlt: Boolean = false) {
+    fun drawStroke(points: List<TouchPoint>) {
         val canvas = Canvas(bitmap!!)
         val limit = Rect()
         val offset = Point()
@@ -132,12 +103,12 @@ class BitmapView : SurfaceView {
                 prePoint.x - offset.x,
                 prePoint.y - offset.y,
                 point.x - offset.x,
-                point.y - offset.y
+                point.y - offset.y,
             )
             prePoint.x = point.x
             prePoint.y = point.y
         }
-        canvas.drawPath(path, if (isErasing xor isAlt) eraserPaint else penPaint)
+        canvas.drawPath(path, penPaint)
     }
 
     companion object {

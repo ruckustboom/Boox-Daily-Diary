@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.RectF
+import com.onyx.android.sdk.rx.RxCallback
 import com.onyx.android.sdk.rx.RxRequest
 import com.onyx.android.sdk.utils.RectUtils
 
@@ -43,4 +44,8 @@ class PartialRefreshRequest(
         val rect = Rect(0, 0, bitmap.width, bitmap.height)
         canvas.drawBitmap(bitmap, rect, rect, null)
     }
+}
+
+class PartialRefreshCallback : RxCallback<PartialRefreshRequest>() {
+    override fun onNext(p0: PartialRefreshRequest) {}
 }
