@@ -16,11 +16,7 @@ open class GestureListener : SimpleOnGestureListener() {
         velocityX: Float,
         velocityY: Float,
     ): Boolean {
-        if (event1 == null) return false
-        val props = MotionEvent.PointerProperties()
-        event2.getPointerProperties(0, props)
-        // Only handle finger events, not pen events
-        if (props.toolType != MotionEvent.TOOL_TYPE_FINGER) return false
+        if (event1 == null || !event2.isType(MotionEvent.TOOL_TYPE_FINGER)) return false
         val diffY = event2.y - event1.y
         val diffX = event2.x - event1.x
         Log.d(TAG, "onFling: $diffY $diffX $velocityX $velocityY")
@@ -69,5 +65,9 @@ open class GestureListener : SimpleOnGestureListener() {
         private const val SWIPE_VELOCITY_THRESHOLD = 1000
         private const val SWIPE_THRESHOLD = 400
         private val TAG = GestureListener::class.java.simpleName
+
+        fun MotionEvent.isType(toolType: Int): Boolean = MotionEvent.PointerProperties()
+            .also { getPointerProperties(0, it) }
+            .toolType == toolType
     }
 }
