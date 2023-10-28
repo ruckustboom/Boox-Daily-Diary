@@ -17,14 +17,10 @@ import kotlin.math.min
 
 class PenCallback(
     private val context: Context,
-    private val views: List<BitmapView>,
+    private val view: BitmapView,
 ) : RawInputCallback() {
-    private lateinit var touchHelper: TouchHelper
-    fun setTouchHelper(touchHelper: TouchHelper) {
-        this.touchHelper = touchHelper
-    }
+    lateinit var touchHelper: TouchHelper
 
-    var isDirty = false
     private var lastDraw = 0L
     var isRawDrawing = false
         private set
@@ -82,10 +78,7 @@ class PenCallback(
     }
 
     override fun onRawDrawingTouchPointListReceived(p0: TouchPointList) {
-        isDirty = true
-        for (view in views) {
-            view.drawToBitmap(p0.points)
-        }
+        view.drawToBitmap(p0.points)
     }
 
     override fun onBeginRawErasing(p0: Boolean, p1: TouchPoint) {
@@ -112,16 +105,13 @@ class PenCallback(
         for (point in pointList) {
             touchPointList.add(point)
         }
-        isDirty = true
-        for (view in views) {
-            view.eraseBitmap(pointList)
-            val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
-            val limit = Rect()
-            val offset = Point()
-            view.getGlobalVisibleRect(limit, offset)
-            eraseRect.offset(-offset.x, -offset.y)
-            view.partialRedraw(eraseRect)
-        }
+        view.eraseBitmap(pointList)
+        val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
+        val limit = Rect()
+        val offset = Point()
+        view.getGlobalVisibleRect(limit, offset)
+        eraseRect.offset(-offset.x, -offset.y)
+        view.partialRedraw(eraseRect)
         isRawDrawing = false
     }
 
@@ -139,26 +129,7 @@ class PenCallback(
             for (point in pointList) {
                 touchPointList.add(point)
             }
-            isDirty = true
-            for (view in views) {
-                view.eraseBitmap(pointList)
-                val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
-                val limit = Rect()
-                val offset = Point()
-                view.getGlobalVisibleRect(limit, offset)
-                eraseRect.offset(-offset.x, -offset.y)
-                view.partialRedraw(eraseRect)
-            }
-        }
-    }
-
-    override fun onRawErasingTouchPointListReceived(p0: TouchPointList) {
-        Log.d(TAG, "onRawErasingTouchPointListReceived")
-        isDirty = true
-
-        for (view in views) {
-            view.eraseBitmap(p0.points)
-//            view.redrawSurface()
+            view.eraseBitmap(pointList)
             val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
             val limit = Rect()
             val offset = Point()
@@ -168,6 +139,18 @@ class PenCallback(
         }
     }
 
+    override fun onRawErasingTouchPointListReceived(p0: TouchPointList) {
+        Log.d(TAG, "onRawErasingTouchPointListReceived")
+
+        view.eraseBitmap(p0.points)
+        val eraseRect = Rect(minTouchX, minTouchY, maxTouchX, maxTouchY)
+        val limit = Rect()
+        val offset = Point()
+        view.getGlobalVisibleRect(limit, offset)
+        eraseRect.offset(-offset.x, -offset.y)
+        view.partialRedraw(eraseRect)
+    }
+
     private val rxManager by lazy {
         RxManager.Builder.initAppContext(context)
         RxManager.Builder.sharedSingleThreadManager()
@@ -175,24 +158,22 @@ class PenCallback(
 
     override fun onPenUpRefresh(refreshRect: RectF) {
         Log.d(TAG, "onPenUpRefresh $isRawDrawing")
-        for (view in views) {
-            val viewRect = RectF(
-                refreshRect.left,
-                refreshRect.top,
-                refreshRect.right,
-                refreshRect.bottom,
-            )
-            val limit = Rect()
-            val offset = Point()
-            view.getGlobalVisibleRect(limit, offset)
-            viewRect.offset(-offset.x.toFloat(), -offset.y.toFloat())
-            rxManager.enqueue(
-                PartialRefreshRequest(context, view, viewRect, view.bitmap),
-                object : RxCallback<PartialRefreshRequest>() {
-                    override fun onNext(partialRefreshRequest: PartialRefreshRequest) {}
-                },
-            )
-        }
+        val viewRect = RectF(
+            refreshRect.left,
+            refreshRect.top,
+            refreshRect.right,
+            refreshRect.bottom,
+        )
+        val limit = Rect()
+        val offset = Point()
+        view.getGlobalVisibleRect(limit, offset)
+        viewRect.offset(-offset.x.toFloat(), -offset.y.toFloat())
+        rxManager.enqueue(
+            PartialRefreshRequest(context, view, viewRect, view.bitmap),
+            object : RxCallback<PartialRefreshRequest>() {
+                override fun onNext(partialRefreshRequest: PartialRefreshRequest) {}
+            },
+        )
     }
 
     companion object {

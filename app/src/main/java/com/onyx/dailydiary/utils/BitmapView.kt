@@ -2,7 +2,6 @@ package com.onyx.dailydiary.utils
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -16,23 +15,12 @@ import android.util.Log
 import android.view.SurfaceView
 import androidx.core.content.res.ResourcesCompat
 import com.onyx.android.sdk.data.note.TouchPoint
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 class BitmapView : SurfaceView {
     var bitmap: Bitmap? = null
         private set
 
     private val mStrokeWidth = 4
-    var fileName: String? = null
-        set(value) {
-            field = value
-            loadBitmap()
-            if (bitmap == null) {
-                resetBitmap()
-            }
-        }
 
     var background = 0
     private val penPaint = Paint().apply {
@@ -53,7 +41,6 @@ class BitmapView : SurfaceView {
         strokeCap = Paint.Cap.SQUARE
         strokeWidth = (10 * mStrokeWidth).toFloat()
     }
-    private var mFilepath: String? = null
 
     constructor(context: Context) : super(context)
 
@@ -75,15 +62,10 @@ class BitmapView : SurfaceView {
         redrawSurface()
     }
 
-    fun setFilepath(filepath: String?) {
-        mFilepath = filepath
-    }
-
     public override fun onDraw(canvas: Canvas) {
         Log.d(TAG, "onDraw")
 
         super.onDraw(canvas)
-        if (bitmap == null) loadBitmap()
         if (bitmap == null) resetBitmap()
         canvas.drawColor(Color.WHITE)
         canvas.drawBitmap(bitmap!!, 0f, 0f, null)
@@ -92,7 +74,7 @@ class BitmapView : SurfaceView {
     public override fun onFocusChanged(
         gainFocus: Boolean,
         direction: Int,
-        previouslyFocusedRect: Rect?
+        previouslyFocusedRect: Rect?,
     ) {
         Log.d(TAG, "onFocusChanged")
         redrawSurface()
@@ -117,24 +99,6 @@ class BitmapView : SurfaceView {
         }
     }
 
-    private fun loadBitmap() {
-        try {
-            Log.d(TAG, "loadBitmap")
-            bitmap?.recycle()
-            val myExternalFile = File(context.getExternalFilesDir(mFilepath), fileName)
-            if (myExternalFile.exists()) {
-                val opt = BitmapFactory.Options()
-                opt.inScaled = true
-                opt.inMutable = true
-                bitmap = BitmapFactory.decodeStream(FileInputStream(myExternalFile), null, opt)
-            } else {
-                resetBitmap()
-            }
-        } catch (e: Exception) {
-            Log.d("loadBitmap Error: ", e.message, e)
-        }
-    }
-
     fun redrawSurface() {
         Log.d(TAG, "redrawSurface")
         if (!holder.surface.isValid) return
@@ -156,19 +120,6 @@ class BitmapView : SurfaceView {
             e.printStackTrace()
         } finally {
             holder.unlockCanvasAndPost(canvas)
-            //            EpdController.resetViewUpdateMode(surfaceView);
-        }
-    }
-
-    fun saveBitmap() {
-        Log.d(TAG, "saveBitmap")
-        val myExternalFile = File(context.getExternalFilesDir(mFilepath), fileName)
-        try {
-            val fos = FileOutputStream(myExternalFile)
-            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            fos.close()
-        } catch (e: Exception) {
-            Log.d("Save bitmap error", e.message, e)
         }
     }
 
