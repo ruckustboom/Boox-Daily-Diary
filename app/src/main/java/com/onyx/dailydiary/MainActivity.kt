@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.view.SurfaceHolder
 import android.view.View
 import android.widget.Button
@@ -16,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.onyx.android.sdk.pen.TouchHelper
+import com.onyx.dailydiary.MainActivity.HolderListener
 import com.onyx.dailydiary.calendar.CalendarAdapter
 import com.onyx.dailydiary.calendar.CalendarViewHolder
 import com.onyx.dailydiary.databinding.ActivityMainBinding
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
     private var dayOfMonth: String? = null
     private val limitRectList = mutableListOf<Rect>()
     private val deviceReceiver = GlobalDeviceReceiver()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -95,10 +96,12 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, View.O
                 binding.taskssurfaceview.resetBitmap()
                 binding.taskssurfaceview.redrawSurface()
             }
+
             R.id.clearsummary -> {
                 binding.summarysurfaceview.resetBitmap()
                 binding.summarysurfaceview.redrawSurface()
             }
+
             R.id.opendiary -> {
                 binding.taskssurfaceview.saveBitmap()
                 binding.summarysurfaceview.saveBitmap()
