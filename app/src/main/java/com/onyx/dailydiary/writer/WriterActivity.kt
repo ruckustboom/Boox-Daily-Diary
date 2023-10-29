@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import com.onyx.dailydiary.R
 import com.onyx.dailydiary.databinding.ActivityWriterBinding
 import com.onyx.dailydiary.utils.GestureListener
 import com.onyx.dailydiary.utils.PenCallback
+import com.onyx.dailydiary.utils.PenType
 
 class WriterActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityWriterBinding
@@ -41,7 +43,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         // setup the gestures
         gestureDetector = GestureDetectorCompat(this, object : GestureListener() {
             override fun onSwipeDown() {
-                deletePage()
+                confirmClearPage()
             }
 
             override fun onSwipeLeft() {
@@ -61,12 +63,24 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         initSurfaceView()
 
         // setup the buttons
-        findViewById<ImageButton>(R.id.deletePage).setOnClickListener(this)
+        findViewById<Button>(R.id.ballpointPen).setOnClickListener(this)
+        findViewById<Button>(R.id.fountainPen).setOnClickListener(this)
+        findViewById<Button>(R.id.charcoalPen).setOnClickListener(this)
+        findViewById<Button>(R.id.charcoalPenV2).setOnClickListener(this)
+        findViewById<Button>(R.id.brushPen).setOnClickListener(this)
+        findViewById<Button>(R.id.markerPen).setOnClickListener(this)
+        findViewById<ImageButton>(R.id.clearPage).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.deletePage -> deletePage()
+            R.id.ballpointPen -> binding.writerview.pen = PenType.Ballpoint
+            R.id.fountainPen -> binding.writerview.pen = PenType.Fountain
+            R.id.charcoalPen -> binding.writerview.pen = PenType.Charcoal
+            R.id.charcoalPenV2 -> binding.writerview.pen = PenType.CharcoalV2
+            R.id.brushPen -> binding.writerview.pen = PenType.Brush
+            R.id.markerPen -> binding.writerview.pen = PenType.Marker
+            R.id.clearPage -> confirmClearPage()
         }
     }
 
@@ -132,11 +146,11 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         touchHelper.isRawDrawingRenderEnabled = true
     }
 
-    private fun deletePage() {
+    private fun confirmClearPage() {
         // delete a page
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(resources.getString(R.string.delete_title))
-        builder.setMessage(resources.getString(R.string.confirm_delete))
+        builder.setTitle(resources.getString(R.string.clear_page_title))
+        builder.setMessage(resources.getString(R.string.confirm_clear_page))
         builder.setPositiveButton(resources.getString(R.string.ok)) { dialog, _ ->
             touchHelper.setRawDrawingEnabled(false)
             touchHelper.isRawDrawingRenderEnabled = false

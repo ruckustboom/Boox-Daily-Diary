@@ -17,25 +17,73 @@
             android:background="@color/black"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center_vertical|center"
-                android:layout_weight="1"
-                android:background="@color/black"
-                android:text="@string/today"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="22sp" />
-
-            <ImageButton
-                android:id="@+id/deletePage"
+            <Button
+                android:id="@+id/ballpointPen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|end"
                 android:background="@color/black"
-                app:srcCompat="@drawable/deletepage"
-                android:contentDescription="@string/delete" />
+                android:textColor="@color/white"
+                android:text="@string/ballpoint" />
+
+            <Button
+                android:id="@+id/fountainPen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:text="@string/fountain" />
+
+            <Button
+                android:id="@+id/charcoalPen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:text="@string/charcoal" />
+
+            <Button
+                android:id="@+id/charcoalPenV2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:text="@string/charcoal_v2" />
+
+            <Button
+                android:id="@+id/brushPen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:text="@string/brush" />
+
+            <Button
+                android:id="@+id/markerPen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:text="@string/marker" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/clearPage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:background="@color/black"
+                android:contentDescription="@string/clear_page"
+                app:srcCompat="@drawable/deletepage" />
         </LinearLayout>
 
         <com.onyx.dailydiary.utils.BitmapView

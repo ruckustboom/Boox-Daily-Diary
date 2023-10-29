@@ -1,9 +1,16 @@
 <resources>
     <string name="app_name">Daily Diary</string>
-    <string name="today">Today</string>
-    <string name="delete">Delete</string>
-    <string name="delete_title">Confirm delete</string>
-    <string name="confirm_delete">You are about to permanently delete the current page. Are you sure?</string>
+    <string name="clear_page">Clear Page</string>
+    <string name="clear_page_title">Confirm Clear Page</string>
+    <string name="confirm_clear_page">You are about to clear the page. Are you sure?</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Tools -->
+    <string name="ballpoint">Ballpoint</string>
+    <string name="fountain">Fountain</string>
+    <string name="charcoal">Charcoal</string>
+    <string name="charcoal_v2">Charcoal v2</string>
+    <string name="brush">Brush</string>
+    <string name="marker">Marker</string>
 </resources>
