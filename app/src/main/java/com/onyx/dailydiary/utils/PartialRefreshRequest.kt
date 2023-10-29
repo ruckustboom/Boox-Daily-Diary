@@ -20,10 +20,6 @@ class PartialRefreshRequest(
     }
 
     override fun execute() {
-        renderToScreen()
-    }
-
-    private fun renderToScreen() {
         if (!surfaceView.holder.surface.isValid) {
             return
         }

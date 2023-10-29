@@ -17,35 +17,18 @@ class PenCallback(
 ) : RawInputCallback() {
     lateinit var touchHelper: TouchHelper
 
-    override fun onBeginRawDrawing(p0: Boolean, p1: TouchPoint) {
-        Log.d(TAG, "onBeginRawDrawing")
-    }
-
-    override fun onEndRawDrawing(p0: Boolean, p1: TouchPoint?) {
-        Log.d(TAG, "onEndRawDrawing")
-    }
-
+    override fun onBeginRawDrawing(p0: Boolean, p1: TouchPoint) {}
+    override fun onEndRawDrawing(p0: Boolean, p1: TouchPoint?) {}
     override fun onRawDrawingTouchPointMoveReceived(p0: TouchPoint) {}
 
     override fun onRawDrawingTouchPointListReceived(p0: TouchPointList) {
         view.drawStroke(p0.points)
     }
 
-    override fun onBeginRawErasing(p0: Boolean, p1: TouchPoint) {
-        Log.d(TAG, "onBeginRawErasing")
-    }
-
-    override fun onEndRawErasing(p0: Boolean, p1: TouchPoint) {
-        Log.d(TAG, "onEndRawErasing")
-    }
-
-    override fun onRawErasingTouchPointMoveReceived(p0: TouchPoint) {
-        Log.d(TAG, "onRawErasingTouchPointMoveReceived")
-    }
-
-    override fun onRawErasingTouchPointListReceived(p0: TouchPointList) {
-        Log.d(TAG, "onRawErasingTouchPointListReceived")
-    }
+    override fun onBeginRawErasing(p0: Boolean, p1: TouchPoint) {}
+    override fun onEndRawErasing(p0: Boolean, p1: TouchPoint) {}
+    override fun onRawErasingTouchPointMoveReceived(p0: TouchPoint) {}
+    override fun onRawErasingTouchPointListReceived(p0: TouchPointList) {}
 
     private val rxManager by lazy {
         RxManager.Builder.initAppContext(context)

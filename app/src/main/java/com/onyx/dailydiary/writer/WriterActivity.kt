@@ -43,6 +43,7 @@ class WriterActivity : AppCompatActivity(), View.OnClickListener {
         // setup the gestures
         gestureDetector = GestureDetectorCompat(this, object : GestureListener() {
             override fun onSwipeDown() {
+                Log.d(TAG, "Swipe Down")
                 confirmClearPage()
             }
 
